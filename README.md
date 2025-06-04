@@ -32,7 +32,7 @@
   </tr>
   <tr>
     <td>📜 <b>Historial de Préstamos:</b><br>Consulta de préstamos por usuario.</td>
-    <td>⚠️ <b>Multas (opcional):</b><br>Cálculo automático de penalizaciones por retraso.</td>
+    <td>⚠️ <b>Multas:</b><br>Cálculo automático de penalizaciones por retraso en la devolución.</td>
   </tr>
 </table>
 
@@ -57,12 +57,12 @@
    source venv/bin/activate
    ```
 
-3. **Instala dependencias**
+3. **Instala las dependencias**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Aplica migraciones**
+4. **Aplica las migraciones**
    ```bash
    python manage.py migrate
    ```
@@ -77,7 +77,7 @@
    python manage.py runserver
    ```
 
-7. **Accede en tu navegador**
+7. **Accede desde tu navegador**
    
    <p align="center"><b>http://127.0.0.1:8000/</b></p>
 
@@ -90,13 +90,13 @@
 | **Libro**   | Datos del libro: título, autor, ISBN, etc.                  |
 | **Socio**   | Información personal de los socios.                         |
 | **Préstamo**| Registro de cada préstamo, fechas y estado.                 |
-| **Multa**   | (Opcional) Penalizaciones por retrasos en devoluciones.     |
+| **Multa**   | Penalizaciones por retrasos en la devolución de libros.     |
 
 ---
 
 ## 💡 Notas Importantes
 
-- Puedes personalizar reglas de multas y periodos de préstamo en la configuración.
+- Puedes personalizar las reglas de multas y los períodos de préstamo en la configuración.
 - El sistema es extensible y adaptable a las necesidades de tu biblioteca.
 - Interfaz amigable, moderna y muy fácil de usar.
 
