@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Préstamos{% endblock %}
+{% block content %}
+<div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:2rem 2.5rem;max-width:1000px;margin:2rem auto;">
+    <h2 style="font-size:2rem;color:#197278;margin-bottom:1.5rem;">Préstamos</h2>
+    <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:space-between;">
+        <a href="{% url 'crear_prestamo' %}" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Nuevo Préstamo</a>
+        <a href="{% url 'lista_prestamos' %}" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Historial de Préstamos</a>
+        <a href="#" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Renovar Préstamo</a>
+    </div>
+    <ul style="margin-top:2rem;">
+        {% for prestamo in prestamos %}
+            <li style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem 0;">
+                <span>
+                    <b>{{ prestamo.socio }}</b> — <b>{{ prestamo.libro }}</b> | Fecha préstamo: {{ prestamo.fecha_prestamo }} | Devolución: {{ prestamo.fecha_devolucion }} | Renovaciones: {{ prestamo.renovaciones }} | {% if prestamo.devuelto %}Devuelto{% else %}No devuelto{% endif %}
+                </span>
+                <span>
+                    <a href="{% url 'editar_prestamo' prestamo.id %}" class="btn btn-sm btn-outline-primary me-2">Editar</a>
+                    <a href="{% url 'eliminar_prestamo' prestamo.id %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </span>
+            </li>
+        {% empty %}
+            <li>No hay préstamos registrados.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    anime({
+        targets: 'ul',
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 700,
+        delay: 200,
+        easing: 'easeOutExpo'
+    });
+</script>
+{% endblock %}

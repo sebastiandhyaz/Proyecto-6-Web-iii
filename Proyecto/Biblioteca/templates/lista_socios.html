@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Socios{% endblock %}
+{% block content %}
+<style>
+    .socios-container {
+        max-width: 900px;
+        margin: 2.5rem auto 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px #0002;
+        padding: 2.5rem 2.2rem 2rem 2.2rem;
+    }
+    .socios-title {
+        font-size: 2rem;
+        color: #197278;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+    .socios-actions {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2.2rem;
+    }
+    .socios-actions a {
+        flex: 1;
+        text-align: center;
+        background: linear-gradient(90deg, #38bdf8 0%, #6366f1 100%);
+        color: #fff;
+        padding: 1rem 0;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: background 0.2s, transform 0.2s;
+        margin-bottom: 0.5rem;
+    }
+    .socios-actions a:hover {
+        background: linear-gradient(90deg, #6366f1 0%, #38bdf8 100%);
+        transform: translateY(-2px) scale(1.03);
+    }
+    .socios-list {
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+    }
+    .socio-card {
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px #0001;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .socio-card:hover {
+        box-shadow: 0 6px 24px #38bdf822;
+        transform: translateY(-2px) scale(1.01);
+    }
+    .socio-info {
+        font-size: 1.08rem;
+        color: #222;
+    }
+    .socio-actions {
+        display: flex;
+        gap: 0.7rem;
+    }
+    .socio-btn {
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1.1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, transform 0.2s;
+        text-decoration: none;
+    }
+    .socio-btn.edit {
+        background: #38bdf8;
+        color: #fff;
+    }
+    .socio-btn.edit:hover {
+        background: #2563eb;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .socio-btn.delete {
+        background: #ef4444;
+        color: #fff;
+    }
+    .socio-btn.delete:hover {
+        background: #b91c1c;
+        color: #fff;
+        transform: scale(1.05);
+    }
+</style>
+<div class="socios-container animate__animated" id="socios-main">
+    <div class="socios-title">Socios</div>
+    <div class="socios-actions">
+        <a href="{% url 'crear_socio' %}">Registrar Socio</a>
+        <a href="{% url 'lista_socios' %}">Listado de Socios</a>
+        <a href="#">Historial de Préstamos</a>
+    </div>
+    <div class="socios-list">
+        {% for socio in socios %}
+            <div class="socio-card">
+                <div class="socio-info"><b>{{ socio.nombre }} {{ socio.apellido }}</b> — DNI: {{ socio.dni }}, Email: {{ socio.email }}</div>
+                <div class="socio-actions">
+                    <a href="{% url 'editar_socio' socio.id %}" class="socio-btn edit">Editar</a>
+                    <a href="{% url 'eliminar_socio' socio.id %}" class="socio-btn delete">Eliminar</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="socio-card">No hay socios registrados.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    anime({
+        targets: '#socios-main',
+        translateY: [40, 0],
+        opacity: [0, 1],
+        duration: 700,
+        easing: 'easeOutExpo'
+    });
+</script>
+{% endblock %}

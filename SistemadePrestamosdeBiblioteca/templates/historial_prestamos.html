@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Historial de Préstamos{% endblock %}
+{% block content %}
+<h2 class="mb-4">Historial de Préstamos</h2>
+<table class="table table-striped anime-fadein">
+  <thead>
+    <tr>
+      <th>Socio</th>
+      <th>Libro</th>
+      <th>Fecha Préstamo</th>
+      <th>Fecha Devolución</th>
+      <th>Devuelto</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for prestamo in prestamos %}
+    <tr>
+      <td>{{ prestamo.socio }}</td>
+      <td>{{ prestamo.libro }}</td>
+      <td>{{ prestamo.fecha_prestamo }}</td>
+      <td>{{ prestamo.fecha_devolucion }}</td>
+      <td>{% if prestamo.devuelto %}Sí{% else %}No{% endif %}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center">No hay préstamos registrados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

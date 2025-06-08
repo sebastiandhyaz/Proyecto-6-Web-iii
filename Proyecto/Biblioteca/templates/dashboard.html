@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<style>
+    .dashboard-container {
+        max-width: 1100px;
+        margin: 2.5rem auto 0 auto;
+        padding: 2.5rem 2rem 2rem 2rem;
+        background: #f9fafc;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px #0002;
+    }
+    .dashboard-title {
+        font-size: 2.3rem;
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 2.5rem;
+        letter-spacing: 1px;
+        text-align: left;
+    }
+    .dashboard-cards {
+        display: flex;
+        gap: 2.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .dashboard-card {
+        background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+        color: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px #6366f133;
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        min-width: 220px;
+        min-height: 170px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-8px) scale(1.04);
+        box-shadow: 0 8px 32px #6366f155;
+    }
+    .dashboard-card i {
+        font-size: 2.8rem;
+        margin-bottom: 0.7rem;
+        color: #fff;
+        filter: drop-shadow(0 2px 8px #0002);
+    }
+    .dashboard-card .label {
+        font-size: 1.15rem;
+        margin-bottom: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    .dashboard-card .value {
+        font-size: 2.3rem;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
+        letter-spacing: 1px;
+    }
+    @media (max-width: 900px) {
+        .dashboard-cards { flex-direction: column; gap: 1.5rem; }
+        .dashboard-card { min-width: 90vw; }
+    }
+</style>
+<div class="dashboard-container animate__animated" id="dashboard-main">
+    <div class="dashboard-title">Estadísticas Generales</div>
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <i class="bi bi-people-fill"></i>
+            <div class="label">Socios</div>
+            <div class="value">{{ total_socios }}</div>
+        </div>
+        <div class="dashboard-card">
+            <i class="bi bi-book"></i>
+            <div class="label">Libros</div>
+            <div class="value">{{ total_libros }}</div>
+        </div>
+        <div class="dashboard-card">
+            <i class="bi bi-handshake"></i>
+            <div class="label">Préstamos activos</div>
+            <div class="value">{{ prestamos_activos }}</div>
+        </div>
+        <div class="dashboard-card">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div class="label">Multas pendientes</div>
+            <div class="value">{{ multas_pendientes }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    anime({
+        targets: '.dashboard-card',
+        translateY: [50, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(120, {start: 200}),
+        duration: 800,
+        easing: 'easeOutExpo'
+    });
+    anime({
+        targets: '#dashboard-main',
+        scale: [0.97, 1],
+        opacity: [0, 1],
+        duration: 600,
+        easing: 'easeOutExpo'
+    });
+</script>
+{% endblock %}
