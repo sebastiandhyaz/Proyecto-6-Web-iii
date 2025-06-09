@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from .forms import UserRegisterForm, SocioForm, LibroForm, PrestamoForm, MultaForm
 from django.contrib.auth.forms import AuthenticationForm
 from Biblioteca.models import Libro, Prestamo, Socio, Multa
+from django.db import models
 
 @csrf_protect
 def login_view(request):

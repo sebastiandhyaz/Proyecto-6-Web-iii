@@ -3,12 +3,12 @@
 {% block content %}
 <div class="form-box animate__animated" id="form-anim" style="max-width: 500px; margin: 0 auto;">
     <h2>{{ titulo }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" style="margin-top:1rem; background:#3b82f6; color:#fff; border:none; border-radius:6px; padding:0.7rem 1.5rem; font-size:1rem; font-weight:600; cursor:pointer;">Guardar</button>
-    </form>
-    <a href="javascript:history.back()" class="switch-link" style="display:block; margin-top:1.2rem;">Volver</a>
+    <<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" style="margin-top:1rem; background:#197278; color:#fff; border:none; border-radius:6px; padding:0.7rem 1.5rem; font-size:1.1rem; font-weight:600; cursor:pointer;">Guardar</button>
+</form>
+<a href="javascript:history.back()" class="switch-link" style="display:block; margin-top:1.2rem; background:#ccc; color:#197278; border-radius:6px; padding:0.7rem 1.5rem; font-size:1.1rem; font-weight:600; text-align:center; text-decoration:none; width:fit-content;">Volver</a>
 </div>
 {% endblock %}
 {% block extra_scripts %}

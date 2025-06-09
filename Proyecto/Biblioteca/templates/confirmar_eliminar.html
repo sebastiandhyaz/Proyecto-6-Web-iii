@@ -4,11 +4,17 @@
     <div class="card shadow p-4 animate__animated" id="delete-confirm-card">
         <h3 class="mb-4 text-danger">¿Estás seguro que deseas eliminar este {{ tipo }}?</h3>
         <p><strong>{{ objeto }}</strong></p>
-        <form method="post">
-            {% csrf_token %}
-            <a href="javascript:history.back()" class="btn btn-secondary">Cancelar</a>
-            <button type="submit" class="btn btn-danger">Eliminar</button>
-        </form>
+        <form method="post" style="display: flex; gap: 1.5rem; margin-top: 2rem;">
+    {% csrf_token %}
+    <a href="javascript:history.back()" 
+       style="font-size:1.2rem;padding:.7rem 2rem;background:#197278;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;">
+       Cancelar
+    </a>
+    <button type="submit" 
+            style="font-size:1.2rem;padding:.7rem 2rem;background:#d7263d;color:#fff;border-radius:6px;font-weight:600;border:none;cursor:pointer;">
+        Eliminar
+    </button>
+</form>
     </div>
 </div>
 {% endblock %}
