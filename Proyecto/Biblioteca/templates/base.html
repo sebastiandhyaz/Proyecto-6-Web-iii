@@ -79,6 +79,31 @@
             .main-content { margin-left: 100px; padding: 1rem; }
             .sidebar a { font-size: 0.9rem; padding: 0.5rem 0.7rem; }
         }
+        input, select, textarea {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    border-radius: 6px;
+    width: 100%;
+    font-size: 1rem;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #15727a;
+    box-shadow: 0 0 0 2px rgba(21, 114, 122, 0.2);
+}
+
+button:hover {
+    background:rgb(124, 16, 16);
+}
+.sidebar a {
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.sidebar a:hover {
+    transform: scale(1.03);
+}
+
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -91,11 +116,15 @@
         <a href="/libros/" class="{% if '/libros' in request.path %}active{% endif %}"><i class="bi bi-book"></i> Libros</a>
         <a href="/prestamos/" class="{% if '/prestamos' in request.path %}active{% endif %}"><i class="bi bi-handshake"></i> Préstamos</a>
         <a href="/multas/" class="{% if '/multas' in request.path %}active{% endif %}"><i class="bi bi-exclamation-triangle"></i> Multas</a>
+         <a href="{% url 'perfil' %}" class="{% if '/perfil/' in request.path %}active{% endif %}">
+        <i class="bi bi-person-circle"></i> Mi Perfil</a>
     </div>
     {% endif %}
     <div class="main-content">
         {% if request.user.is_authenticated and request.path != '/' and request.path != '/register/' %}
         <div class="user-bar">
+            <a href="{% url 'perfil' %}" style="margin-right:1rem; color:#197278; font-weight:600;">
+        <i class="bi bi-person"></i> {{ request.user.username }}</a>
             <span>{{ request.user.username }}</span>
             <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
         </div>

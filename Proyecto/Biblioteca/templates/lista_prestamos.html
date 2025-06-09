@@ -1,38 +1,149 @@
 {% extends 'base.html' %}
 {% block title %}Préstamos{% endblock %}
 {% block content %}
-<div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:2rem 2.5rem;max-width:1000px;margin:2rem auto;">
-    <h2 style="font-size:2rem;color:#197278;margin-bottom:1.5rem;">Préstamos</h2>
-    <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:space-between;">
-        <a href="{% url 'crear_prestamo' %}" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Nuevo Préstamo</a>
-        <a href="{% url 'lista_prestamos' %}" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Historial de Préstamos</a>
-        <a href="#" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Renovar Préstamo</a>
+<style>
+    .prestamos-container {
+        max-width: 900px;
+        margin: 2.5rem auto 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px #0002;
+        padding: 2.5rem 2.2rem 2rem 2.2rem;
+    }
+    .prestamos-title {
+        font-size: 2rem;
+        color: #197278;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+    .prestamos-actions {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2.2rem;
+    }
+    .prestamos-actions a {
+        flex: 1;
+        text-align: center;
+        background: linear-gradient(90deg, #38bdf8 0%, #6366f1 100%);
+        color: #fff;
+        padding: 1rem 0;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: background 0.2s, transform 0.2s;
+        margin-bottom: 0.5rem;
+    }
+    .prestamos-actions a:hover {
+        background: linear-gradient(90deg, #6366f1 0%, #38bdf8 100%);
+        transform: translateY(-2px) scale(1.03);
+    }
+    .prestamos-list {
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+    }
+    .prestamo-card {
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px #0001;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .prestamo-card:hover {
+        box-shadow: 0 6px 24px #38bdf822;
+        transform: translateY(-2px) scale(1.01);
+    }
+    .prestamo-info {
+        font-size: 1.08rem;
+        color: #222;
+    }
+    .prestamo-actions {
+        display: flex;
+        gap: 0.7rem;
+    }
+    .prestamo-btn {
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1.1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, transform 0.2s;
+        text-decoration: none;
+    }
+    .prestamo-btn.edit {
+        background: #38bdf8;
+        color: #fff;
+    }
+    .prestamo-btn.edit:hover {
+        background: #2563eb;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .prestamo-btn.delete {
+        background: #ef4444;
+        color: #fff;
+    }
+    .prestamo-btn.delete:hover {
+        background: #b91c1c;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .estado-devuelto {
+        color: #16a34a;
+        font-weight: 600;
+    }
+    .estado-pendiente {
+        color: #d97706;
+        font-weight: 600;
+    }
+</style>
+<div class="prestamos-container animate__animated" id="prestamos-main">
+    <div class="prestamos-title">Préstamos</div>
+    <div class="prestamos-actions">
+        <a href="{% url 'crear_prestamo' %}">Nuevo Préstamo</a>
+        <a href="{% url 'lista_prestamos' %}">Historial de Préstamos</a>
+        <a href="#">Renovar Préstamo</a>
     </div>
-    <ul style="margin-top:2rem;">
+    <div class="prestamos-list">
         {% for prestamo in prestamos %}
-            <li style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem 0;">
-                <span>
-                    <b>{{ prestamo.socio }}</b> — <b>{{ prestamo.libro }}</b> | Fecha préstamo: {{ prestamo.fecha_prestamo }} | Devolución: {{ prestamo.fecha_devolucion }} | Renovaciones: {{ prestamo.renovaciones }} | {% if prestamo.devuelto %}Devuelto{% else %}No devuelto{% endif %}
-                </span>
-                <span>
-                    <a href="{% url 'editar_prestamo' prestamo.id %}" class="btn btn-sm btn-outline-primary me-2">Editar</a>
-                    <a href="{% url 'eliminar_prestamo' prestamo.id %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
-                </span>
-            </li>
+            <div class="prestamo-card">
+                <div class="prestamo-info">
+                    <b>{{ prestamo.socio }}</b> — <b>{{ prestamo.libro }}</b><br>
+                    <small>
+                        Préstamo: {{ prestamo.fecha_prestamo|date:"d/m/Y" }} | 
+                        Devolución: {{ prestamo.fecha_devolucion|date:"d/m/Y" }} | 
+                        Renovaciones: {{ prestamo.renovaciones }} | 
+                        <span class="{% if prestamo.devuelto %}estado-devuelto{% else %}estado-pendiente{% endif %}">
+                            {% if prestamo.devuelto %}DEVUELTO{% else %}PENDIENTE{% endif %}
+                        </span>
+                    </small>
+                </div>
+                <div class="prestamo-actions">
+                    <a href="{% url 'editar_prestamo' prestamo.id %}" class="prestamo-btn edit">Editar</a>
+                    <a href="{% url 'eliminar_prestamo' prestamo.id %}" class="prestamo-btn delete">Eliminar</a>
+                </div>
+            </div>
         {% empty %}
-            <li>No hay préstamos registrados.</li>
+            <div class="prestamo-card">No hay préstamos registrados.</div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}
 {% block extra_scripts %}
 <script>
     anime({
-        targets: 'ul',
-        translateY: [30, 0],
+        targets: '#prestamos-main',
+        translateY: [40, 0],
         opacity: [0, 1],
         duration: 700,
-        delay: 200,
         easing: 'easeOutExpo'
     });
 </script>

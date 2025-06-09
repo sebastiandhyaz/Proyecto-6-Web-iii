@@ -1,38 +1,148 @@
 {% extends 'base.html' %}
 {% block title %}Multas{% endblock %}
 {% block content %}
-<div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:2rem 2.5rem;max-width:1000px;margin:2rem auto;">
-    <h2 style="font-size:2rem;color:#197278;margin-bottom:1.5rem;">Multas</h2>
-    <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:space-between;">
-        <a href="{% url 'crear_multa' %}" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Registrar Multa</a>
-        <a href="{% url 'lista_multas' %}" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Listado de Multas</a>
-        <a href="#" style="flex:1;text-align:center;background:#197278;color:#fff;padding:1rem 0;border-radius:8px;text-decoration:none;font-weight:600;">Socios con Multas</a>
+<style>
+    .multas-container {
+        max-width: 900px;
+        margin: 2.5rem auto 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px #0002;
+        padding: 2.5rem 2.2rem 2rem 2.2rem;
+    }
+    .multas-title {
+        font-size: 2rem;
+        color: #197278;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+    .multas-actions {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2.2rem;
+    }
+    .multas-actions a {
+        flex: 1;
+        text-align: center;
+        background: linear-gradient(90deg, #38bdf8 0%, #6366f1 100%);
+        color: #fff;
+        padding: 1rem 0;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: background 0.2s, transform 0.2s;
+        margin-bottom: 0.5rem;
+    }
+    .multas-actions a:hover {
+        background: linear-gradient(90deg, #6366f1 0%, #38bdf8 100%);
+        transform: translateY(-2px) scale(1.03);
+    }
+    .multas-list {
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+    }
+    .multa-card {
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px #0001;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .multa-card:hover {
+        box-shadow: 0 6px 24px #38bdf822;
+        transform: translateY(-2px) scale(1.01);
+    }
+    .multa-info {
+        font-size: 1.08rem;
+        color: #222;
+    }
+    .multa-actions {
+        display: flex;
+        gap: 0.7rem;
+    }
+    .multa-btn {
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1.1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, transform 0.2s;
+        text-decoration: none;
+    }
+    .multa-btn.edit {
+        background: #38bdf8;
+        color: #fff;
+    }
+    .multa-btn.edit:hover {
+        background: #2563eb;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .multa-btn.delete {
+        background: #ef4444;
+        color: #fff;
+    }
+    .multa-btn.delete:hover {
+        background: #b91c1c;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .estado-pagada {
+        color: #16a34a;
+        font-weight: 600;
+    }
+    .estado-pendiente {
+        color: #d97706;
+        font-weight: 600;
+    }
+</style>
+<div class="multas-container animate__animated" id="multas-main">
+    <div class="multas-title">Multas</div>
+    <div class="multas-actions">
+        <a href="{% url 'crear_multa' %}">Registrar Multa</a>
+        <a href="{% url 'lista_multas' %}">Listado de Multas</a>
+        <a href="#">Socios con Multas</a>
     </div>
-    <ul style="margin-top:2rem;">
+    <div class="multas-list">
         {% for multa in multas %}
-            <li style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem 0;">
-                <span>
-                    <b>{{ multa.socio }}</b> — Préstamo: {{ multa.prestamo }} | Monto: ${{ multa.monto }} | Fecha: {{ multa.fecha_multa }} | Estado: {{ multa.estado }}
-                </span>
-                <span>
-                    <a href="{% url 'editar_multa' multa.id %}" class="btn btn-sm btn-outline-primary me-2">Editar</a>
-                    <a href="{% url 'eliminar_multa' multa.id %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
-                </span>
-            </li>
+            <div class="multa-card">
+                <div class="multa-info">
+                    <b>{{ multa.socio }}</b> — Préstamo: {{ multa.prestamo.libro.titulo }}<br>
+                    <small>
+                        Monto: ${{ multa.monto }} | 
+                        Fecha: {{ multa.fecha_multa|date:"d/m/Y" }} | 
+                        Estado: <span class="{% if multa.estado == 'Pagada' %}estado-pagada{% else %}estado-pendiente{% endif %}">
+                            {{ multa.estado|upper }}
+                        </span>
+                    </small>
+                </div>
+                <div class="multa-actions">
+                    <a href="{% url 'editar_multa' multa.id %}" class="multa-btn edit">Editar</a>
+                    <a href="{% url 'eliminar_multa' multa.id %}" class="multa-btn delete">Eliminar</a>
+                </div>
+            </div>
         {% empty %}
-            <li>No hay multas registradas.</li>
+            <div class="multa-card">No hay multas registradas.</div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}
 {% block extra_scripts %}
 <script>
     anime({
-        targets: 'ul',
-        translateY: [30, 0],
+        targets: '#multas-main',
+        translateY: [40, 0],
         opacity: [0, 1],
         duration: 700,
-        delay: 200,
         easing: 'easeOutExpo'
     });
 </script>

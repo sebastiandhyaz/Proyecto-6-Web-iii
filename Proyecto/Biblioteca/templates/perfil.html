@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Mi Perfil{% endblock %}
+{% block content %}
+<style>
+    .perfil-container {
+        max-width: 900px;
+        margin: 2.5rem auto 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px #0002;
+        padding: 2.5rem 2.2rem 2rem 2.2rem;
+    }
+    .perfil-title {
+        font-size: 2rem;
+        color: #197278;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+    .perfil-card {
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px #0001;
+        margin-bottom: 2rem;
+    }
+    .perfil-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    .info-group {
+        margin-bottom: 1.2rem;
+    }
+    .info-group label {
+        display: block;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 0.3rem;
+        font-size: 0.95rem;
+    }
+    .info-group p {
+        font-size: 1.1rem;
+        color: #1e293b;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .perfil-actions {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+    .perfil-btn {
+        text-align: center;
+        background: linear-gradient(90deg, #38bdf8 0%, #6366f1 100%);
+        color: #fff;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: background 0.2s, transform 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    .perfil-btn:hover {
+        background: linear-gradient(90deg, #6366f1 0%, #38bdf8 100%);
+        transform: translateY(-2px) scale(1.03);
+    }
+    .perfil-btn.secondary {
+        background: #e2e8f0;
+        color: #475569;
+    }
+    .perfil-btn.secondary:hover {
+        background: #cbd5e1;
+    }
+</style>
+
+<div class="perfil-container animate__animated" id="perfil-main">
+    <div class="perfil-title">Mi Perfil</div>
+    
+    <div class="perfil-card">
+        <div class="perfil-info">
+            <div class="info-group">
+                <label>Nombre de usuario</label>
+                <p>{{ user.username }}</p>
+            </div>
+            <div class="info-group">
+                <label>Correo electrónico</label>
+                <p>{{ user.email }}</p>
+            </div>
+            <div class="info-group">
+                <label>Nombre completo</label>
+                <p>{{ user.get_full_name }}</p>
+            </div>
+            <div class="info-group">
+                <label>Último acceso</label>
+                <p>{{ user.last_login|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div class="info-group">
+                <label>Fecha de registro</label>
+                <p>{{ user.date_joined|date:"d/m/Y" }}</p>
+            </div>
+            <div class="info-group">
+                <label>Rol</label>
+                <p>
+                    {% if user.is_superuser %}
+                        Administrador
+                    {% else %}
+                        Usuario estándar
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="perfil-card">
+        <h3 style="font-size:1.4rem; color:#197278; margin-bottom:1.5rem;">
+            <i class="bi bi-activity"></i> Mis Estadísticas
+        </h3>
+        <div class="perfil-info">
+            <div class="info-group">
+                <label>Préstamos activos</label>
+                <p>{{ prestamos_activos }}</p>
+            </div>
+            <div class="info-group">
+                <label>Multas pendientes</label>
+                <p>{{ multas_pendientes }}</p>
+            </div>
+            <div class="info-group">
+                <label>Libros favoritos</label>
+                <p>{{ libros_favoritos }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    anime({
+        targets: '#perfil-main',
+        translateY: [40, 0],
+        opacity: [0, 1],
+        duration: 700,
+        easing: 'easeOutExpo'
+    });
+</script>
+{% endblock %}

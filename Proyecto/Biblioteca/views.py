@@ -7,6 +7,7 @@ from .forms import UserRegisterForm, SocioForm, LibroForm, PrestamoForm, MultaFo
 from django.contrib.auth.forms import AuthenticationForm
 from Biblioteca.models import Libro, Prestamo, Socio, Multa
 
+
 @csrf_protect
 def login_view(request):
     if request.user.is_authenticated:
@@ -212,3 +213,8 @@ def eliminar_multa(request, multa_id):
         messages.success(request, 'Multa eliminada correctamente.')
         return redirect('lista_multas')
     return render(request, 'confirmar_eliminar.html', {'objeto': multa, 'tipo': 'Multa'})
+@login_required
+def perfil_view(request):
+    return render(request, 'perfil.html', {
+        'user': request.user  # Solo pasa el usuario
+    })
