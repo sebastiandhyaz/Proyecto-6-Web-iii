@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Biblioteca{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Panel de Control</h1>
+</div>
+<!-- Tarjetas resumen -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-blue-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
+        <span class="text-2xl font-bold">{{ total_libros }}</span>
+        <span class="text-gray-700">Libros registrados</span>
+    </div>
+    <div class="bg-green-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
+        <span class="text-2xl font-bold">{{ prestamos_activos }}</span>
+        <span class="text-gray-700">Préstamos activos</span>
+    </div>
+    <div class="bg-yellow-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
+        <span class="text-2xl font-bold">{{ socios_activos }}</span>
+        <span class="text-gray-700">Socios activos</span>
+    </div>
+    <div class="bg-red-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
+        <span class="text-2xl font-bold">${{ multas_pendientes }}</span>
+        <span class="text-gray-700">Multas pendientes</span>
+    </div>
+</div>
+<!-- Gráficos -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-semibold mb-2">Préstamos y Devoluciones por mes</h2>
+        <canvas id="prestamosChart"></canvas>
+    </div>
+    <div class="bg-white p-6 rounded shadow">
+        <h2 class="font-semibold mb-2">Libros por categoría</h2>
+        <canvas id="categoriasChart" class="pie-chart"></canvas>
+    </div>
+</div>
+<script>
+// Gráfico de préstamos y devoluciones
+var ctx = document.getElementById('prestamosChart').getContext('2d');
+var prestamosChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ meses|safe }},
+        datasets: [
+            {
+                label: 'Préstamos',
+                data: {{ prestamos_mes|safe }},
+                backgroundColor: 'rgba(59, 130, 246, 0.5)'
+            },
+            {
+                label: 'Devoluciones',
+                data: {{ devoluciones_mes|safe }},
+                backgroundColor: 'rgba(16, 185, 129, 0.5)'
+            }
+        ]
+    }
+});
+// Gráfico de libros por categoría
+var ctx2 = document.getElementById('categoriasChart').getContext('2d');
+var categoriasChart = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: {{ categorias|safe }},
+        datasets: [{
+            data: {{ libros_por_categoria|safe }},
+            backgroundColor: ['#3b82f6', '#f59e42', '#10b981', '#ef4444', '#6366f1', '#fbbf24', '#a3e635']
+        }]
+    }
+});
+// Redirección del botón de configuración
+const configBtn = document.getElementById('configuracion-btn');
+if(configBtn) configBtn.onclick = function() {
+    window.location.href = '/users/perfil/';
+};
+</script>
+{% endblock %}

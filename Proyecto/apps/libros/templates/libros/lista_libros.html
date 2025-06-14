@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Libros | Biblioteca{% endblock %}
+{% block content %}
+<div class="main-panel-anim">
+<h1 class="text-2xl font-bold mb-4">Libros</h1>
+<!-- Barra de búsqueda y filtros -->
+<div class="flex flex-wrap gap-4 items-center mb-6">
+    <input type="text" placeholder="Buscar por título o autor" class="border rounded px-3 py-2 flex-1 min-w-[200px]" />
+    <select class="border rounded px-3 py-2">
+        <option value="">Todas las categorías</option>
+        <option value="ficcion">Ficción</option>
+        <option value="no-ficcion">No Ficción</option>
+    </select>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition main-btn-anim">Buscar</button>
+</div>
+<!-- Botón Crear Libro -->
+<div class="mb-4">
+    <button id="abrir-modal-crear-libro" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Libro</button>
+</div>
+<!-- Modal Crear Libro -->
+<div id="modal-crear-libro" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-8 w-full max-w-md relative modal-anim">
+        <button id="cerrar-modal-crear-libro" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+        <h2 class="text-xl font-bold mb-4">Nuevo Libro</h2>
+        <form>
+            <div class="mb-4">
+                <input type="text" placeholder="Título" class="border rounded px-3 py-2 w-full mb-2" required />
+                <input type="text" placeholder="Autor" class="border rounded px-3 py-2 w-full mb-2" required />
+                <input type="text" placeholder="ISBN" class="border rounded px-3 py-2 w-full mb-2" required />
+                <input type="number" placeholder="Cantidad disponible" class="border rounded px-3 py-2 w-full mb-2" required />
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" id="cerrar-modal-crear-libro2" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded transition main-btn-anim">Cancelar</button>
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition main-btn-anim">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Tabla de libros -->
+<table class="min-w-full bg-white rounded shadow overflow-hidden">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="px-4 py-2">Título</th>
+            <th class="px-4 py-2">Autor</th>
+            <th class="px-4 py-2">ISBN</th>
+            <th class="px-4 py-2">Disponibles</th>
+            <th class="px-4 py-2">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if libros|length == 0 %}
+        <tr>
+            <td colspan="5" class="text-center py-8 text-gray-500">No hay libros registrados. Usa el botón <b>Crear Libro</b> para agregar uno nuevo.</td>
+        </tr>
+        {% else %}
+        {% for libro in libros %}
+        <tr class="border-b hover:bg-blue-50 transition">
+            <td class="px-4 py-2">{{ libro.titulo }}</td>
+            <td class="px-4 py-2">{{ libro.autor }}</td>
+            <td class="px-4 py-2">{{ libro.isbn }}</td>
+            <td class="px-4 py-2">{{ libro.disponibles }}</td>
+            <td class="px-4 py-2 flex gap-2 justify-center">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+<script>
+// Modal animado con anime.js
+const modalLibro = document.getElementById('modal-crear-libro');
+const abrirLibro = document.getElementById('abrir-modal-crear-libro');
+const cerrarLibro = document.getElementById('cerrar-modal-crear-libro');
+const cerrarLibro2 = document.getElementById('cerrar-modal-crear-libro2');
+function abrirModalLibro() {
+    modalLibro.classList.remove('hidden');
+    anime({
+        targets: '#modal-crear-libro .modal-anim',
+        opacity: [0, 1],
+        scale: [0.92, 1],
+        translateY: [40, 0],
+        duration: 350,
+        easing: 'easeOutCubic'
+    });
+}
+function cerrarModalLibro() {
+    anime({
+        targets: '#modal-crear-libro .modal-anim',
+        opacity: [1, 0],
+        scale: [1, 0.92],
+        translateY: [0, 40],
+        duration: 250,
+        easing: 'easeInCubic',
+        complete: () => modalLibro.classList.add('hidden')
+    });
+}
+abrirLibro.onclick = abrirModalLibro;
+cerrarLibro.onclick = cerrarModalLibro;
+cerrarLibro2.onclick = cerrarModalLibro;
+// Animación de botones de acción
+const actionBtnsLibro = document.querySelectorAll('.action-btn');
+actionBtnsLibro.forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+        anime({
+            targets: btn,
+            scale: 1.07,
+            boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
+            duration: 180,
+            easing: 'easeOutQuad'
+        });
+    });
+    btn.addEventListener('mouseleave', () => {
+        anime({
+            targets: btn,
+            scale: 1,
+            boxShadow: '0 0px 0px 0 rgba(0,0,0,0)',
+            duration: 180,
+            easing: 'easeOutQuad'
+        });
+    });
+});
+</script>
+</div>
+{% endblock %}

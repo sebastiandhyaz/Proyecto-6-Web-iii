@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Libro | Biblioteca{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Detalle del libro</h1>
+<div class="bg-white p-6 rounded shadow-md max-w-lg mx-auto mb-4">
+    <p><strong>Título:</strong> {{ libro.titulo }}</p>
+    <p><strong>Autor:</strong> {{ libro.autor }}</p>
+    <p><strong>ISBN:</strong> {{ libro.isbn }}</p>
+    <p><strong>Categoría:</strong> {{ libro.categoria }}</p>
+    <p><strong>Editorial:</strong> {{ libro.editorial }}</p>
+    <p><strong>Año:</strong> {{ libro.anio }}</p>
+    <p><strong>Disponibles:</strong> {{ libro.disponibles }}</p>
+    <p><strong>Prestados:</strong> {{ libro.prestados }}</p>
+    <p><strong>Dañados:</strong> {{ libro.danados }}</p>
+    <p><strong>Descripción:</strong> {{ libro.descripcion }}</p>
+    {% if libro.portada %}
+        <img src="{{ libro.portada.url }}" alt="Portada" class="w-32 mt-2" />
+    {% endif %}
+</div>
+<a href="{% url 'editar_libro' libro.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Editar</a>
+<a href="{% url 'eliminar_libro' libro.pk %}" class="bg-gray-500 text-white px-4 py-2 rounded">Eliminar</a>
+{% endblock %}
