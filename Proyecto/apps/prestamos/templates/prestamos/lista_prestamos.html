@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Préstamos | Biblioteca{% endblock %}
 {% block content %}
+{% csrf_token %}
 <div class="main-panel-anim">
 <h1 class="text-2xl font-bold mb-4">Préstamos</h1>
 <!-- Barra de búsqueda y filtros -->
@@ -16,26 +17,7 @@
 </div>
 <!-- Botón Crear Préstamo -->
 <div class="mb-4">
-    <button id="abrir-modal-crear-prestamo" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Préstamo</button>
-</div>
-<!-- Modal Crear Préstamo -->
-<div id="modal-crear-prestamo" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md relative modal-anim">
-        <button id="cerrar-modal-crear-prestamo" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-        <h2 class="text-xl font-bold mb-4">Nuevo Préstamo</h2>
-        <form>
-            <div class="mb-4">
-                <input type="text" placeholder="Socio" class="border rounded px-3 py-2 w-full mb-2" required />
-                <input type="text" placeholder="Libro" class="border rounded px-3 py-2 w-full mb-2" required />
-                <input type="date" placeholder="Fecha préstamo" class="border rounded px-3 py-2 w-full mb-2" required />
-                <input type="date" placeholder="Fecha devolución" class="border rounded px-3 py-2 w-full mb-2" required />
-            </div>
-            <div class="flex justify-end gap-2">
-                <button type="button" id="cerrar-modal-crear-prestamo2" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded transition main-btn-anim">Cancelar</button>
-                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition main-btn-anim">Guardar</button>
-            </div>
-        </form>
-    </div>
+    <a href="{% url 'nuevo_prestamo' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Préstamo</a>
 </div>
 <!-- Tabla de préstamos -->
 <table class="min-w-full bg-white rounded shadow overflow-hidden">
@@ -43,25 +25,25 @@
         <tr class="bg-gray-100">
             <th class="px-4 py-2">Socio</th>
             <th class="px-4 py-2">Libro</th>
+            <th class="px-4 py-2">Fecha Préstamo</th>
+            <th class="px-4 py-2">Fecha Devolución</th>
             <th class="px-4 py-2">Estado</th>
-            <th class="px-4 py-2">F. Préstamo</th>
-            <th class="px-4 py-2">F. Devolución</th>
             <th class="px-4 py-2">Acciones</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="prestamos-tbody">
         {% if prestamos|length == 0 %}
-        <tr>
+        <tr id="no-prestamos-message">
             <td colspan="6" class="text-center py-8 text-gray-500">No hay préstamos registrados. Usa el botón <b>Crear Préstamo</b> para agregar uno nuevo.</td>
         </tr>
         {% else %}
         {% for prestamo in prestamos %}
-        <tr class="border-b hover:bg-blue-50 transition">
-            <td class="px-4 py-2">{{ prestamo.socio }}</td>
-            <td class="px-4 py-2">{{ prestamo.libro }}</td>
-            <td class="px-4 py-2">{{ prestamo.estado }}</td>
+        <tr class="border-b hover:bg-blue-50 transition" id="prestamo-{{ prestamo.id }}">
+            <td class="px-4 py-2">{{ prestamo.socio.user.get_full_name }}</td>
+            <td class="px-4 py-2">{{ prestamo.libro.titulo }}</td>
             <td class="px-4 py-2">{{ prestamo.fecha_prestamo }}</td>
             <td class="px-4 py-2">{{ prestamo.fecha_devolucion_estimada }}</td>
+            <td class="px-4 py-2">{{ prestamo.estado }}</td>
             <td class="px-4 py-2 flex gap-2 justify-center">
                 <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
                 <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
@@ -72,59 +54,41 @@
         {% endif %}
     </tbody>
 </table>
+</div>
 <script>
-// Modal animado con anime.js
-const modalPrestamo = document.getElementById('modal-crear-prestamo');
-const abrirPrestamo = document.getElementById('abrir-modal-crear-prestamo');
-const cerrarPrestamo = document.getElementById('cerrar-modal-crear-prestamo');
-const cerrarPrestamo2 = document.getElementById('cerrar-modal-crear-prestamo2');
-function abrirModalPrestamo() {
-    modalPrestamo.classList.remove('hidden');
-    anime({
-        targets: '#modal-crear-prestamo .modal-anim',
-        opacity: [0, 1],
-        scale: [0.92, 1],
-        translateY: [40, 0],
-        duration: 350,
-        easing: 'easeOutCubic'
-    });
-}
-function cerrarModalPrestamo() {
-    anime({
-        targets: '#modal-crear-prestamo .modal-anim',
-        opacity: [1, 0],
-        scale: [1, 0.92],
-        translateY: [0, 40],
-        duration: 250,
-        easing: 'easeInCubic',
-        complete: () => modalPrestamo.classList.add('hidden')
-    });
-}
-abrirPrestamo.onclick = abrirModalPrestamo;
-cerrarPrestamo.onclick = cerrarModalPrestamo;
-cerrarPrestamo2.onclick = cerrarModalPrestamo;
-// Animación de botones de acción
-const actionBtnsPrestamo = document.querySelectorAll('.action-btn');
-actionBtnsPrestamo.forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-        anime({
-            targets: btn,
-            scale: 1.07,
-            boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
-            duration: 180,
-            easing: 'easeOutQuad'
-        });
-    });
-    btn.addEventListener('mouseleave', () => {
-        anime({
-            targets: btn,
-            scale: 1,
-            boxShadow: '0 0px 0px 0 rgba(0,0,0,0)',
-            duration: 180,
-            easing: 'easeOutQuad'
-        });
-    });
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const prestamoId = row.id.replace('prestamo-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `{% url 'detalle_prestamo' 0 %}`.replace('0', prestamoId);
+        } else if (action === 'Editar') {
+            window.location.href = `{% url 'editar_prestamo' 0 %}`.replace('0', prestamoId);
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar este préstamo? Esta acción no se puede deshacer.')) {
+                fetch(`{% url 'eliminar_prestamo' 0 %}`.replace('0', prestamoId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Devolver') {
+            if (confirm('¿Confirmar devolución de este préstamo?')) {
+                fetch(`{% url 'devolver_prestamo' 0 %}`.replace('0', prestamoId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        }
+    }
 });
 </script>
-</div>
 {% endblock %}

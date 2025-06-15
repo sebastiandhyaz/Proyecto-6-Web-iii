@@ -27,13 +27,23 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "0.0.0.0",
     "glorious-engine-gwj94w9rgq7c957q-8000.app.github.dev",
+    "glorious-engine-gwj94w9rgq7c957q-8001.app.github.dev",
+    ".app.github.dev",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://glorious-engine-gwj94w9rgq7c957q-8000.app.github.dev",
+    "https://glorious-engine-gwj94w9rgq7c957q-8001.app.github.dev",
     "http://localhost:8000",
     "https://localhost:8000",
+    "http://localhost:8001",
+    "https://localhost:8001",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
+    "https://127.0.0.1:8001",
 ]
 
 # Login & logout redirects
@@ -49,6 +59,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third party apps
+    "crispy_forms",
+    "crispy_bootstrap4",
     # Apps del sistema
     "apps.estadisticas",
     "apps.socios",
@@ -57,6 +70,10 @@ INSTALLED_APPS = [
     "apps.multas",
     "users",
 ]
+
+# Crispy forms configuration
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -125,6 +142,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

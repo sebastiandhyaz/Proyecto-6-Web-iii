@@ -5,6 +5,8 @@ from .models import Multa
 from .forms import MultaForm
 from django.db.models import Q
 from datetime import date
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 @login_required
 def lista_multas(request):
@@ -59,4 +61,42 @@ def nueva_multa(request):
             return redirect('lista_multas')
     else:
         form = MultaForm()
-    return render(request, 'multas/nueva_multa.html', {'form': form})
+    return render(request, 'multas/nueva_multa_form.html', {'form': form})
+
+@login_required
+def nueva_multa_modal(request):
+    if request.method == 'POST':
+        form = MultaForm(request.POST)
+        if form.is_valid():
+            multa = form.save()
+            html = render_to_string('multas/multa_row.html', {'multa': multa}, request=request)
+            return JsonResponse({'success': True, 'html': html})
+        else:
+            html = render_to_string('multas/nueva_multa_form.html', {'form': form}, request=request)
+            return JsonResponse({'success': False, 'form_html': html})
+    else:
+        form = MultaForm()
+        html = render_to_string('multas/nueva_multa_form.html', {'form': form}, request=request)
+        return JsonResponse({'form_html': html})
+
+@login_required
+def editar_multa(request, pk):
+    multa = get_object_or_404(Multa, pk=pk)
+    if request.method == 'POST':
+        form = MultaForm(request.POST, instance=multa)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Multa actualizada correctamente.')
+            return redirect('lista_multas')
+    else:
+        form = MultaForm(instance=multa)
+    return render(request, 'multas/editar_multa.html', {'form': form, 'multa': multa})
+
+@login_required
+def eliminar_multa(request, pk):
+    multa = get_object_or_404(Multa, pk=pk)
+    if request.method == 'POST':
+        multa.delete()
+        messages.success(request, 'Multa eliminada correctamente.')
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})

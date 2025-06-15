@@ -39,6 +39,10 @@ def dashboard(request):
     proximos_vencimientos = Prestamo.objects.filter(estado='activo', fecha_devolucion_estimada__lte=hoy+timedelta(days=3)).order_by('fecha_devolucion_estimada')[:5]
     multas_recientes = Multa.objects.filter(fecha_generada__gte=hoy-timedelta(days=7)).order_by('-fecha_generada')[:5]
 
+    # Gráfico de socios por estado
+    estados_socios = list(Socio.objects.values_list('estado', flat=True).distinct())
+    socios_por_estado = [Socio.objects.filter(estado=estado).count() for estado in estados_socios]
+
     context = {
         'total_libros': total_libros,
         'prestamos_activos': prestamos_activos,
@@ -52,6 +56,8 @@ def dashboard(request):
         'movimientos': movimientos,
         'proximos_vencimientos': proximos_vencimientos,
         'multas_recientes': multas_recientes,
+        'estados_socios': estados_socios,
+        'socios_por_estado': socios_por_estado,
     }
     return render(request, 'estadisticas/dashboard.html', context)
 

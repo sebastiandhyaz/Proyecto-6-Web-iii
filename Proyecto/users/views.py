@@ -14,7 +14,7 @@ def login_register(request):
                 user = login_form.get_user()
                 login(request, user)
                 messages.success(request, 'Bienvenido, sesión iniciada correctamente.')
-                return redirect('dashboard')
+                return redirect('/estadisticas/')
             else:
                 messages.error(request, 'Usuario o contraseña incorrectos.')
         elif 'register' in request.POST:
@@ -23,7 +23,7 @@ def login_register(request):
                 user = register_form.save()
                 login(request, user)
                 messages.success(request, 'Registro exitoso. ¡Bienvenido!')
-                return redirect('dashboard')
+                return redirect('/estadisticas/')
             else:
                 for field, errors in register_form.errors.items():
                     for error in errors:

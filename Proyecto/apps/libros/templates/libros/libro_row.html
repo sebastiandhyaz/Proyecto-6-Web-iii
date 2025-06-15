@@ -1,0 +1,11 @@
+<tr id="libro-{{ libro.id }}" class="border-b hover:bg-blue-50 transition">
+    <td class="px-4 py-2">{{ libro.titulo }}</td>
+    <td class="px-4 py-2">{{ libro.autor }}</td>
+    <td class="px-4 py-2">{{ libro.isbn }}</td>
+    <td class="px-4 py-2">{{ libro.disponibles }}</td>
+    <td class="px-4 py-2 flex gap-2 justify-center">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+        <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+        <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+    </td>
+</tr>

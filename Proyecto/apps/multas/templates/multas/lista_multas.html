@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Multas | Biblioteca{% endblock %}
 {% block content %}
+{% csrf_token %}
 <div class="main-panel-anim">
 <h1 class="text-2xl font-bold mb-4">Multas</h1>
 <!-- Barra de búsqueda y filtros -->
@@ -15,53 +16,35 @@
 </div>
 <!-- Botón Crear Multa -->
 <div class="mb-4">
-    <button id="abrir-modal-crear-multa" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Multa</button>
-</div>
-<!-- Modal Crear Multa -->
-<div id="modal-crear-multa" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md relative modal-anim">
-        <button id="cerrar-modal-crear-multa" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-        <h2 class="text-xl font-bold mb-4">Nueva Multa</h2>
-        <form>
-            <div class="mb-4">
-                <input type="text" placeholder="Socio" class="border rounded px-3 py-2 w-full mb-2" required />
-                <input type="number" placeholder="Monto" class="border rounded px-3 py-2 w-full mb-2" required />
-                <input type="text" placeholder="Motivo" class="border rounded px-3 py-2 w-full mb-2" required />
-                <select class="border rounded px-3 py-2 w-full">
-                    <option value="impaga">Impaga</option>
-                    <option value="pagada">Pagada</option>
-                </select>
-            </div>
-            <div class="flex justify-end gap-2">
-                <button type="button" id="cerrar-modal-crear-multa2" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded transition main-btn-anim">Cancelar</button>
-                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition main-btn-anim">Guardar</button>
-            </div>
-        </form>
-    </div>
+    <a href="{% url 'nueva_multa' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Multa</a>
 </div>
 <!-- Tabla de multas -->
 <table class="min-w-full bg-white rounded shadow overflow-hidden">
     <thead>
         <tr class="bg-gray-100">
             <th class="px-4 py-2">Socio</th>
+            <th class="px-4 py-2">Libro</th>
             <th class="px-4 py-2">Monto</th>
             <th class="px-4 py-2">Motivo</th>
-            <th class="px-4 py-2">Estado</th>
+            <th class="px-4 py-2">Fecha</th>
+            <th class="px-4 py-2">Pagada</th>
             <th class="px-4 py-2">Acciones</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="multas-tbody">
         {% if multas|length == 0 %}
-        <tr>
-            <td colspan="5" class="text-center py-8 text-gray-500">No hay multas registradas. Usa el botón <b>Crear Multa</b> para agregar una nueva.</td>
+        <tr id="no-multas-message">
+            <td colspan="7" class="text-center py-8 text-gray-500">No hay multas registradas. Usa el botón <b>Crear Multa</b> para agregar una nueva.</td>
         </tr>
         {% else %}
         {% for multa in multas %}
-        <tr class="border-b hover:bg-blue-50 transition">
-            <td class="px-4 py-2">{{ multa.socio }}</td>
+        <tr class="border-b hover:bg-blue-50 transition" id="multa-{{ multa.id }}">
+            <td class="px-4 py-2">{{ multa.socio.user.get_full_name }}</td>
+            <td class="px-4 py-2">{{ multa.prestamo.libro.titulo }}</td>
             <td class="px-4 py-2">{{ multa.monto }}</td>
             <td class="px-4 py-2">{{ multa.motivo }}</td>
-            <td class="px-4 py-2">{% if multa.pagada %}Pagada{% else %}Impaga{% endif %}</td>
+            <td class="px-4 py-2">{{ multa.fecha_generada }}</td>
+            <td class="px-4 py-2">{% if multa.pagada %}Sí{% else %}No{% endif %}</td>
             <td class="px-4 py-2 flex gap-2 justify-center">
                 <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
                 <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
@@ -72,59 +55,53 @@
         {% endif %}
     </tbody>
 </table>
+</div>
 <script>
-// Modal animado con anime.js
-const modalMulta = document.getElementById('modal-crear-multa');
-const abrirMulta = document.getElementById('abrir-modal-crear-multa');
-const cerrarMulta = document.getElementById('cerrar-modal-crear-multa');
-const cerrarMulta2 = document.getElementById('cerrar-modal-crear-multa2');
-function abrirModalMulta() {
-    modalMulta.classList.remove('hidden');
-    anime({
-        targets: '#modal-crear-multa .modal-anim',
-        opacity: [0, 1],
-        scale: [0.92, 1],
-        translateY: [40, 0],
-        duration: 350,
-        easing: 'easeOutCubic'
-    });
-}
-function cerrarModalMulta() {
-    anime({
-        targets: '#modal-crear-multa .modal-anim',
-        opacity: [1, 0],
-        scale: [1, 0.92],
-        translateY: [0, 40],
-        duration: 250,
-        easing: 'easeInCubic',
-        complete: () => modalMulta.classList.add('hidden')
-    });
-}
-abrirMulta.onclick = abrirModalMulta;
-cerrarMulta.onclick = cerrarModalMulta;
-cerrarMulta2.onclick = cerrarModalMulta;
-// Animación de botones de acción
-const actionBtnsMulta = document.querySelectorAll('.action-btn');
-actionBtnsMulta.forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-        anime({
-            targets: btn,
-            scale: 1.07,
-            boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
-            duration: 180,
-            easing: 'easeOutQuad'
-        });
-    });
-    btn.addEventListener('mouseleave', () => {
-        anime({
-            targets: btn,
-            scale: 1,
-            boxShadow: '0 0px 0px 0 rgba(0,0,0,0)',
-            duration: 180,
-            easing: 'easeOutQuad'
-        });
-    });
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const multaId = row.id.replace('multa-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `{% url 'detalle_multa' 0 %}`.replace('0', multaId);
+        } else if (action === 'Editar') {
+            window.location.href = `{% url 'editar_multa' 0 %}`.replace('0', multaId);
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar esta multa? Esta acción no se puede deshacer.')) {
+                fetch(`{% url 'eliminar_multa' 0 %}`.replace('0', multaId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Pagar') {
+            if (confirm('¿Confirmar pago de esta multa?')) {
+                fetch(`{% url 'pagar_multa' 0 %}`.replace('0', multaId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Anular') {
+            const justificacion = prompt('Justificación para anular la multa:');
+            if (justificacion) {
+                fetch(`{% url 'anular_multa' 0 %}`.replace('0', multaId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({justificacion: justificacion})
+                }).then(() => location.reload());
+            }
+        }
+    }
 });
 </script>
-</div>
 {% endblock %}

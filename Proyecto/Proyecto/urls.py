@@ -17,6 +17,9 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from Proyecto.views_dashboard import dashboard_stats
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,4 +29,9 @@ urlpatterns = [
     path("libros/", include("apps.libros.urls")),
     path("prestamos/", include("apps.prestamos.urls")),
     path("multas/", include("apps.multas.urls")),
+    path("api/dashboard-stats/", dashboard_stats, name="dashboard_stats"),
 ]
+
+# Servir archivos de medios en desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

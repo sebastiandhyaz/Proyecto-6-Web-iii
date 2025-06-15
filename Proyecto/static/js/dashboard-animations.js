@@ -184,6 +184,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // --- INTEGRACIÓN CON DASHBOARD UPDATES ---
+    // Disparar evento para actualizar dashboard tras cada alta exitosa
+    function triggerDashboardUpdate() {
+        if (typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new Event('dashboardUpdate'));
+        }
+    }
+
+    // Agregar eventos de actualización después de insertar elementos
+    document.addEventListener('DOMNodeInserted', function(e) {
+        const target = e.target;
+        if (target.id && (target.id.includes('socio-') || target.id.includes('libro-') || 
+                         target.id.includes('prestamo-') || target.id.includes('multa-'))) {
+            setTimeout(triggerDashboardUpdate, 100);
+        }
+    });
+
     // Llamar a las funciones de animación
     animarPanelLateral();
     animarPanelesAplicaciones();

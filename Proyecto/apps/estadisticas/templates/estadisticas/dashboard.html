@@ -1,76 +1,321 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Dashboard Biblioteca{% endblock %}
 {% block content %}
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Panel de Control</h1>
+    <div class="text-sm text-gray-500">
+        <span id="last-update">Actualizado ahora</span>
+    </div>
 </div>
+
 <!-- Tarjetas resumen -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="bg-blue-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
-        <span class="text-2xl font-bold">{{ total_libros }}</span>
-        <span class="text-gray-700">Libros registrados</span>
+    <div class="bg-blue-100 p-6 rounded-lg shadow-lg flex flex-col items-center dashboard-card transform hover:scale-105 transition-transform cursor-pointer" data-type="libros">
+        <div class="text-4xl mb-2">📚</div>
+        <span class="text-3xl font-bold text-blue-700" id="total-libros">{{ total_libros }}</span>
+        <span class="text-gray-700 font-medium">Libros registrados</span>
     </div>
-    <div class="bg-green-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
-        <span class="text-2xl font-bold">{{ prestamos_activos }}</span>
-        <span class="text-gray-700">Préstamos activos</span>
+    <div class="bg-green-100 p-6 rounded-lg shadow-lg flex flex-col items-center dashboard-card transform hover:scale-105 transition-transform cursor-pointer" data-type="prestamos">
+        <div class="text-4xl mb-2">📖</div>
+        <span class="text-3xl font-bold text-green-700" id="prestamos-activos">{{ prestamos_activos }}</span>
+        <span class="text-gray-700 font-medium">Préstamos activos</span>
     </div>
-    <div class="bg-yellow-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
-        <span class="text-2xl font-bold">{{ socios_activos }}</span>
-        <span class="text-gray-700">Socios activos</span>
+    <div class="bg-yellow-100 p-6 rounded-lg shadow-lg flex flex-col items-center dashboard-card transform hover:scale-105 transition-transform cursor-pointer" data-type="socios">
+        <div class="text-4xl mb-2">👥</div>
+        <span class="text-3xl font-bold text-yellow-700" id="socios-activos">{{ socios_activos }}</span>
+        <span class="text-gray-700 font-medium">Socios activos</span>
     </div>
-    <div class="bg-red-100 p-6 rounded shadow flex flex-col items-center dashboard-card">
-        <span class="text-2xl font-bold">${{ multas_pendientes }}</span>
-        <span class="text-gray-700">Multas pendientes</span>
-    </div>
-</div>
-<!-- Gráficos -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <div class="bg-white p-6 rounded shadow">
-        <h2 class="font-semibold mb-2">Préstamos y Devoluciones por mes</h2>
-        <canvas id="prestamosChart"></canvas>
-    </div>
-    <div class="bg-white p-6 rounded shadow">
-        <h2 class="font-semibold mb-2">Libros por categoría</h2>
-        <canvas id="categoriasChart" class="pie-chart"></canvas>
+    <div class="bg-red-100 p-6 rounded-lg shadow-lg flex flex-col items-center dashboard-card transform hover:scale-105 transition-transform cursor-pointer" data-type="multas">
+        <div class="text-4xl mb-2">💰</div>
+        <span class="text-3xl font-bold text-red-700" id="multas-pendientes">${{ multas_pendientes }}</span>
+        <span class="text-gray-700 font-medium">Multas pendientes</span>
     </div>
 </div>
+
+<!-- Gráfico de torta interactivo en tiempo real -->
+<div class="bg-white p-8 rounded-lg shadow-lg">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Estadísticas en Tiempo Real</h2>
+        <div class="flex gap-2">
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-sm text-green-600 font-medium">En vivo</span>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Gráfico de torta -->
+        <div class="relative">
+            <canvas id="realtimePieChart" width="400" height="400" class="mx-auto"></canvas>
+            <div id="chart-center-info" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <div class="text-3xl font-bold text-gray-800" id="total-items">0</div>
+                <div class="text-sm text-gray-600">Total de elementos</div>
+            </div>
+        </div>
+        
+        <!-- Leyenda interactiva -->
+        <div class="space-y-4">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Detalles por categoría</h3>
+            <div id="legend-container" class="space-y-3">
+                <!-- Se llena dinámicamente -->
+            </div>
+            
+            <!-- Información adicional -->
+            <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                <h4 class="font-semibold text-gray-700 mb-2">Estadísticas rápidas</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Más activo:</span>
+                        <div class="font-semibold" id="most-active">-</div>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Última actualización:</span>
+                        <div class="font-semibold" id="update-time">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Gráfico de préstamos y devoluciones
-var ctx = document.getElementById('prestamosChart').getContext('2d');
-var prestamosChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: {{ meses|safe }},
-        datasets: [
-            {
-                label: 'Préstamos',
-                data: {{ prestamos_mes|safe }},
-                backgroundColor: 'rgba(59, 130, 246, 0.5)'
-            },
-            {
-                label: 'Devoluciones',
-                data: {{ devoluciones_mes|safe }},
-                backgroundColor: 'rgba(16, 185, 129, 0.5)'
-            }
-        ]
-    }
-});
-// Gráfico de libros por categoría
-var ctx2 = document.getElementById('categoriasChart').getContext('2d');
-var categoriasChart = new Chart(ctx2, {
+// Variables globales
+let realtimeChart;
+let chartData = {
+    libros: 0,
+    prestamos: 0,
+    socios: 0,
+    multas: 0
+};
+
+// Configuración del gráfico
+const chartConfig = {
     type: 'doughnut',
     data: {
-        labels: {{ categorias|safe }},
+        labels: ['Libros', 'Préstamos Activos', 'Socios Activos', 'Multas Pendientes'],
         datasets: [{
-            data: {{ libros_por_categoria|safe }},
-            backgroundColor: ['#3b82f6', '#f59e42', '#10b981', '#ef4444', '#6366f1', '#fbbf24', '#a3e635']
+            data: [0, 0, 0, 0],
+            backgroundColor: [
+                '#3b82f6', // Azul para libros
+                '#10b981', // Verde para préstamos
+                '#f59e0b', // Amarillo para socios
+                '#ef4444'  // Rojo para multas
+            ],
+            borderColor: '#ffffff',
+            borderWidth: 3,
+            hoverBorderWidth: 5,
+            hoverOffset: 15
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '50%',
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#ffffff',
+                bodyColor: '#ffffff',
+                borderColor: '#ffffff',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: true,
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label;
+                        const value = context.parsed;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                        return `${label}: ${value} (${percentage}%)`;
+                    }
+                }
+            }
+        },
+        animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1000,
+            easing: 'easeOutQuart'
+        },
+        interaction: {
+            intersect: false,
+            mode: 'point'
+        },
+        onHover: (event, elements) => {
+            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+        },
+        onClick: (event, elements) => {
+            if (elements.length > 0) {
+                const index = elements[0].index;
+                const urls = ['/libros/', '/prestamos/', '/socios/', '/multas/'];
+                window.location.href = urls[index];
+            }
+        }
+    }
+};
+
+// Inicializar el gráfico
+function initChart() {
+    const ctx = document.getElementById('realtimePieChart').getContext('2d');
+    realtimeChart = new Chart(ctx, chartConfig);
+    updateChart();
+}
+
+// Actualizar el gráfico con animaciones
+function updateChart() {
+    fetch('/api/dashboard-stats/')
+        .then(response => response.json())
+        .then(data => {
+            // Actualizar datos
+            chartData.libros = data.libros || 0;
+            chartData.prestamos = data.prestamos || 0;
+            chartData.socios = data.socios || 0;
+            chartData.multas = parseFloat(data.multas) || 0;
+            
+            // Actualizar tarjetas con animación
+            animateValue('total-libros', chartData.libros);
+            animateValue('prestamos-activos', chartData.prestamos);
+            animateValue('socios-activos', chartData.socios);
+            animateValue('multas-pendientes', '$' + chartData.multas.toFixed(2));
+            
+            // Actualizar gráfico
+            realtimeChart.data.datasets[0].data = [
+                chartData.libros,
+                chartData.prestamos,
+                chartData.socios,
+                chartData.multas
+            ];
+            realtimeChart.update('active');
+            
+            // Actualizar información central
+            const total = chartData.libros + chartData.prestamos + chartData.socios + chartData.multas;
+            animateValue('total-items', Math.round(total));
+            
+            // Actualizar leyenda
+            updateLegend();
+            
+            // Actualizar tiempo
+            document.getElementById('update-time').textContent = new Date().toLocaleTimeString();
+            document.getElementById('last-update').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
+            
+            // Determinar más activo
+            const mostActive = Object.entries(chartData).reduce((a, b) => 
+                chartData[a] > chartData[b[0]] ? a : b[0], 'libros');
+            document.getElementById('most-active').textContent = 
+                mostActive.charAt(0).toUpperCase() + mostActive.slice(1);
+        })
+        .catch(error => {
+            console.error('Error updating dashboard:', error);
+        });
+}
+
+// Animar valores numéricos
+function animateValue(elementId, finalValue) {
+    const element = document.getElementById(elementId);
+    const isMonetary = typeof finalValue === 'string' && finalValue.startsWith('$');
+    const numericValue = isMonetary ? parseFloat(finalValue.substring(1)) : parseInt(finalValue);
+    const currentValue = isMonetary ? 
+        parseFloat(element.textContent.substring(1)) || 0 : 
+        parseInt(element.textContent) || 0;
+    
+    if (currentValue === numericValue) return;
+    
+    const increment = (numericValue - currentValue) / 20;
+    let current = currentValue;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= numericValue) || (increment < 0 && current <= numericValue)) {
+            current = numericValue;
+            clearInterval(timer);
+        }
+        element.textContent = isMonetary ? 
+            '$' + current.toFixed(2) : 
+            Math.round(current).toString();
+    }, 50);
+}
+
+// Actualizar leyenda interactiva
+function updateLegend() {
+    const container = document.getElementById('legend-container');
+    const labels = ['Libros', 'Préstamos', 'Socios', 'Multas'];
+    const values = [chartData.libros, chartData.prestamos, chartData.socios, chartData.multas];
+    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+    const total = values.reduce((a, b) => a + b, 0);
+    
+    container.innerHTML = labels.map((label, index) => {
+        const percentage = total > 0 ? ((values[index] / total) * 100).toFixed(1) : 0;
+        return `
+            <div class="flex items-center justify-between p-3 bg-white rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" 
+                 style="border-left-color: ${colors[index]}" 
+                 onclick="highlightSegment(${index})">
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full" style="background-color: ${colors[index]}"></div>
+                    <span class="font-medium text-gray-700">${label}</span>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold text-gray-800">${values[index]}</div>
+                    <div class="text-sm text-gray-500">${percentage}%</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Resaltar segmento del gráfico
+function highlightSegment(index) {
+    realtimeChart.setActiveElements([{datasetIndex: 0, index: index}]);
+    realtimeChart.update('none');
+}
+
+// Interacción con tarjetas
+document.addEventListener('click', function(e) {
+    const card = e.target.closest('.dashboard-card');
+    if (card) {
+        const type = card.dataset.type;
+        const index = ['libros', 'prestamos', 'socios', 'multas'].indexOf(type);
+        if (index !== -1) {
+            highlightSegment(index);
+        }
     }
 });
-// Redirección del botón de configuración
-const configBtn = document.getElementById('configuracion-btn');
-if(configBtn) configBtn.onclick = function() {
-    window.location.href = '/users/perfil/';
-};
+
+// Inicializar y configurar actualizaciones automáticas
+document.addEventListener('DOMContentLoaded', function() {
+    initChart();
+    
+    // Actualizar cada 30 segundos
+    setInterval(updateChart, 30000);
+    
+    // Escuchar eventos de actualización del dashboard
+    window.addEventListener('dashboardUpdate', function() {
+        setTimeout(updateChart, 500); // Pequeño delay para que se procese el cambio
+    });
+});
 </script>
+
+<style>
+#realtimePieChart {
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+}
+
+.dashboard-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+.animate-pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+</style>
 {% endblock %}

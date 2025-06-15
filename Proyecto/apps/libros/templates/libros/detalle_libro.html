@@ -1,22 +1,113 @@
 {% extends 'base.html' %}
 {% block title %}Detalle Libro | Biblioteca{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Detalle del libro</h1>
-<div class="bg-white p-6 rounded shadow-md max-w-lg mx-auto mb-4">
-    <p><strong>Título:</strong> {{ libro.titulo }}</p>
-    <p><strong>Autor:</strong> {{ libro.autor }}</p>
-    <p><strong>ISBN:</strong> {{ libro.isbn }}</p>
-    <p><strong>Categoría:</strong> {{ libro.categoria }}</p>
-    <p><strong>Editorial:</strong> {{ libro.editorial }}</p>
-    <p><strong>Año:</strong> {{ libro.anio }}</p>
-    <p><strong>Disponibles:</strong> {{ libro.disponibles }}</p>
-    <p><strong>Prestados:</strong> {{ libro.prestados }}</p>
-    <p><strong>Dañados:</strong> {{ libro.danados }}</p>
-    <p><strong>Descripción:</strong> {{ libro.descripcion }}</p>
-    {% if libro.portada %}
-        <img src="{{ libro.portada.url }}" alt="Portada" class="w-32 mt-2" />
-    {% endif %}
+<div class="main-panel-anim">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Detalle del libro</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="md:flex">
+                <!-- Sección de imagen -->
+                <div class="md:w-1/3 p-6 bg-gray-50">
+                    {% if libro.portada %}
+                        <div class="book-cover-large">
+                            <picture>
+                                <img src="{{ libro.portada.url }}" alt="Portada de {{ libro.titulo }}" 
+                                     onerror="this.style.display='none'; document.getElementById('no-image-placeholder').style.display='block';" />
+                            </picture>
+                        </div>
+                    {% endif %}
+                    <div id="no-image-placeholder" 
+                         class="book-cover-large bg-gray-200 flex items-center justify-center {% if libro.portada %}hidden{% endif %}">
+                        <div class="text-center text-gray-500">
+                            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                            </svg>
+                            <p class="text-sm">Sin imagen disponible</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección de información -->
+                <div class="md:w-2/3 p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ libro.titulo }}</h2>
+                            <p class="text-xl text-gray-600">por {{ libro.autor }}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">ISBN</p>
+                                <p class="text-lg text-gray-800">{{ libro.isbn }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Categoría</p>
+                                <p class="text-lg text-gray-800">{{ libro.categoria }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Editorial</p>
+                                <p class="text-lg text-gray-800">{{ libro.editorial }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Año</p>
+                                <p class="text-lg text-gray-800">{{ libro.anio }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-green-600">{{ libro.disponibles }}</p>
+                                <p class="text-sm text-gray-500">Disponibles</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-blue-600">{{ libro.prestados }}</p>
+                                <p class="text-sm text-gray-500">Prestados</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-red-600">{{ libro.danados }}</p>
+                                <p class="text-sm text-gray-500">Dañados</p>
+                            </div>
+                        </div>
+                        
+                        {% if libro.descripcion %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 mb-2">Descripción</p>
+                            <p class="text-gray-700 leading-relaxed">{{ libro.descripcion }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Debug info (solo para desarrollo) -->
+                        {% if debug %}
+                        <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mt-4">
+                            <p class="text-sm text-yellow-800">
+                                <strong>Debug:</strong> 
+                                {% if libro.portada %}
+                                    Imagen: {{ libro.portada.url }} | Archivo: {{ libro.portada.name }}
+                                {% else %}
+                                    No hay imagen asociada
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="bg-gray-50 px-6 py-4 border-t">
+                <div class="flex gap-3">
+                    <a href="{% url 'editar_libro' libro.pk %}" 
+                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition main-btn-anim">
+                        Editar
+                    </a>
+                    <a href="{% url 'lista_libros' %}" 
+                       class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition main-btn-anim">
+                        Volver a la lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<a href="{% url 'editar_libro' libro.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Editar</a>
-<a href="{% url 'eliminar_libro' libro.pk %}" class="bg-gray-500 text-white px-4 py-2 rounded">Eliminar</a>
 {% endblock %}

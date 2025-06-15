@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from .models import Socio
 from .forms import SocioForm
 from django.db.models import Q
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 @login_required
 def lista_socios(request):
@@ -39,7 +41,7 @@ def nuevo_socio(request):
                 return redirect('lista_socios')
     else:
         form = SocioForm()
-    return render(request, 'socios/nuevo_socio.html', {'form': form})
+    return render(request, 'socios/nuevo_socio_form.html', {'form': form})
 
 @login_required
 def detalle_socio(request, pk):
@@ -75,3 +77,41 @@ def eliminar_socio(request, pk):
     socio.delete()
     messages.success(request, 'Socio eliminado.')
     return redirect('lista_socios')
+
+@login_required
+def nuevo_socio_modal(request):
+    if request.method == 'POST':
+        form = SocioForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            nombre = form.cleaned_data['nombre']
+            apellido = form.cleaned_data.get('apellido', '')
+            
+            # Verificar si ya existe un usuario con ese email
+            if User.objects.filter(email=email).exists():
+                form.add_error('email', 'Ya existe un usuario con ese email.')
+                html = render_to_string('socios/nuevo_socio_form.html', {'form': form}, request=request)
+                return JsonResponse({'success': False, 'form_html': html})
+            
+            # Crear el usuario
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=nombre,
+                last_name=apellido
+            )
+            
+            # Crear el socio
+            socio = form.save(commit=False)
+            socio.user = user
+            socio.save()
+            
+            html = render_to_string('socios/socio_row.html', {'socio': socio}, request=request)
+            return JsonResponse({'success': True, 'html': html})
+        else:
+            html = render_to_string('socios/nuevo_socio_form.html', {'form': form}, request=request)
+            return JsonResponse({'success': False, 'form_html': html})
+    else:
+        form = SocioForm()
+        html = render_to_string('socios/nuevo_socio_form.html', {'form': form}, request=request)
+        return JsonResponse({'form_html': html})

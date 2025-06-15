@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Socios | Biblioteca{% endblock %}
 {% block content %}
+{% csrf_token %}
 <div class="main-panel-anim">
 <h1 class="text-2xl font-bold mb-4">Socios</h1>
 <!-- Barra de búsqueda y filtros -->
@@ -15,28 +16,7 @@
 </div>
 <!-- Botón Crear Socio -->
 <div class="mb-4">
-    <button id="abrir-modal-crear" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Socio</button>
-</div>
-<!-- Modal Crear Socio -->
-<div id="modal-crear" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md relative modal-anim">
-        <button id="cerrar-modal-crear" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
-        <h2 class="text-xl font-bold mb-4">Nuevo Socio</h2>
-        <form>
-            <div class="mb-4">
-                <input type="text" placeholder="Nombre completo" class="border rounded px-3 py-2 w-full mb-2" required />
-                <input type="email" placeholder="Email" class="border rounded px-3 py-2 w-full mb-2" required />
-                <select class="border rounded px-3 py-2 w-full">
-                    <option value="activo">Activo</option>
-                    <option value="bloqueado">Bloqueado</option>
-                </select>
-            </div>
-            <div class="flex justify-end gap-2">
-                <button type="button" id="cerrar-modal-crear2" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded transition main-btn-anim">Cancelar</button>
-                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition main-btn-anim">Guardar</button>
-            </div>
-        </form>
-    </div>
+    <a href="{% url 'nuevo_socio' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Socio</a>
 </div>
 <!-- Tabla de socios -->
 <table class="min-w-full bg-white rounded shadow overflow-hidden">
@@ -48,14 +28,14 @@
             <th class="px-4 py-2">Acciones</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="socios-tbody">
         {% if socios|length == 0 %}
-        <tr>
+        <tr id="no-socios-message">
             <td colspan="4" class="text-center py-8 text-gray-500">No hay socios registrados. Usa el botón <b>Crear Socio</b> para agregar uno nuevo.</td>
         </tr>
         {% else %}
         {% for socio in socios %}
-        <tr class="border-b hover:bg-blue-50 transition">
+        <tr class="border-b hover:bg-blue-50 transition" id="socio-{{ socio.id }}">
             <td class="px-4 py-2">{{ socio.user.get_full_name }}</td>
             <td class="px-4 py-2">{{ socio.user.email }}</td>
             <td class="px-4 py-2">{{ socio.estado }}</td>
@@ -72,58 +52,41 @@
         {% endif %}
     </tbody>
 </table>
+<!-- Scripts -->
 <script>
-// Modal animado con anime.js
-const modal = document.getElementById('modal-crear');
-const abrir = document.getElementById('abrir-modal-crear');
-const cerrar = document.getElementById('cerrar-modal-crear');
-const cerrar2 = document.getElementById('cerrar-modal-crear2');
-function abrirModal() {
-    modal.classList.remove('hidden');
-    anime({
-        targets: '.modal-anim',
-        opacity: [0, 1],
-        scale: [0.92, 1],
-        translateY: [40, 0],
-        duration: 350,
-        easing: 'easeOutCubic'
-    });
-}
-function cerrarModal() {
-    anime({
-        targets: '.modal-anim',
-        opacity: [1, 0],
-        scale: [1, 0.92],
-        translateY: [0, 40],
-        duration: 250,
-        easing: 'easeInCubic',
-        complete: () => modal.classList.add('hidden')
-    });
-}
-abrir.onclick = abrirModal;
-cerrar.onclick = cerrarModal;
-cerrar2.onclick = cerrarModal;
-// Animación de botones de acción
-const actionBtns = document.querySelectorAll('.action-btn');
-actionBtns.forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-        anime({
-            targets: btn,
-            scale: 1.07,
-            boxShadow: '0 2px 8px 0 rgba(59,130,246,0.10)',
-            duration: 180,
-            easing: 'easeOutQuad'
-        });
-    });
-    btn.addEventListener('mouseleave', () => {
-        anime({
-            targets: btn,
-            scale: 1,
-            boxShadow: '0 0px 0px 0 rgba(0,0,0,0)',
-            duration: 180,
-            easing: 'easeOutQuad'
-        });
-    });
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const socioId = row.id.replace('socio-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `/socios/${socioId}/`;
+        } else if (action === 'Editar') {
+            window.location.href = `/socios/${socioId}/editar/`;
+        } else if (action === 'Bloquear') {
+            if (confirm('¿Estás seguro de que quieres bloquear este socio?')) {
+                fetch(`/socios/${socioId}/bloquear/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar este socio? Esta acción no se puede deshacer.')) {
+                fetch(`/socios/${socioId}/eliminar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        }
+    }
 });
 </script>
 </div>

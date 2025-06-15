@@ -5,6 +5,8 @@ from .models import Prestamo
 from .forms import PrestamoForm
 from django.db.models import Q
 from datetime import date
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 @login_required
 def lista_prestamos(request):
@@ -39,7 +41,7 @@ def nuevo_prestamo(request):
                 return redirect('lista_prestamos')
     else:
         form = PrestamoForm()
-    return render(request, 'prestamos/nuevo_prestamo.html', {'form': form})
+    return render(request, 'prestamos/nuevo_prestamo_form.html', {'form': form})
 
 @login_required
 def detalle_prestamo(request, pk):
@@ -70,3 +72,53 @@ def renovar_prestamo(request, pk):
     else:
         messages.error(request, 'No se puede renovar este préstamo.')
     return redirect('detalle_prestamo', pk=pk)
+
+@login_required
+def nuevo_prestamo_modal(request):
+    if request.method == 'POST':
+        form = PrestamoForm(request.POST)
+        if form.is_valid():
+            prestamo = form.save(commit=False)
+            if prestamo.libro.disponibles < 1:
+                html = render_to_string('prestamos/nuevo_prestamo_form.html', {'form': form}, request=request)
+                return JsonResponse({'success': False, 'form_html': html, 'error': 'No hay ejemplares disponibles.'})
+            else:
+                prestamo.save()
+                prestamo.libro.disponibles -= 1
+                prestamo.libro.prestados += 1
+                prestamo.libro.save()
+                html = render_to_string('prestamos/prestamo_row.html', {'prestamo': prestamo}, request=request)
+                return JsonResponse({'success': True, 'html': html})
+        else:
+            html = render_to_string('prestamos/nuevo_prestamo_form.html', {'form': form}, request=request)
+            return JsonResponse({'success': False, 'form_html': html})
+    else:
+        form = PrestamoForm()
+        html = render_to_string('prestamos/nuevo_prestamo_form.html', {'form': form}, request=request)
+        return JsonResponse({'form_html': html})
+
+@login_required
+def editar_prestamo(request, pk):
+    prestamo = get_object_or_404(Prestamo, pk=pk)
+    if request.method == 'POST':
+        form = PrestamoForm(request.POST, instance=prestamo)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Préstamo actualizado correctamente.')
+            return redirect('lista_prestamos')
+    else:
+        form = PrestamoForm(instance=prestamo)
+    return render(request, 'prestamos/editar_prestamo.html', {'form': form, 'prestamo': prestamo})
+
+@login_required
+def eliminar_prestamo(request, pk):
+    prestamo = get_object_or_404(Prestamo, pk=pk)
+    if request.method == 'POST':
+        # Restaurar disponibilidad del libro
+        prestamo.libro.disponibles += 1
+        prestamo.libro.prestados -= 1
+        prestamo.libro.save()
+        prestamo.delete()
+        messages.success(request, 'Préstamo eliminado correctamente.')
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})

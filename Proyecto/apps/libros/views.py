@@ -4,6 +4,8 @@ from django.contrib import messages
 from .models import Libro
 from .forms import LibroForm
 from django.db.models import Q
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 @login_required
 def lista_libros(request):
@@ -26,12 +28,16 @@ def nuevo_libro(request):
     if request.method == 'POST':
         form = LibroForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            libro = form.save()
+            # Forzar el procesamiento de imagen si se subió una
+            if libro.portada:
+                print(f"🔄 Procesando imagen para libro: {libro.titulo}")
+                libro.resize_image()
             messages.success(request, 'Libro agregado correctamente.')
             return redirect('lista_libros')
     else:
         form = LibroForm()
-    return render(request, 'libros/nuevo_libro.html', {'form': form})
+    return render(request, 'libros/nuevo_libro_form.html', {'form': form})
 
 @login_required
 def detalle_libro(request, pk):
@@ -44,7 +50,15 @@ def editar_libro(request, pk):
     if request.method == 'POST':
         form = LibroForm(request.POST, request.FILES, instance=libro)
         if form.is_valid():
-            form.save()
+            # Verificar si se subió una nueva imagen
+            imagen_anterior = libro.portada
+            libro_actualizado = form.save()
+            
+            # Si cambió la imagen, procesarla
+            if libro_actualizado.portada and libro_actualizado.portada != imagen_anterior:
+                print(f"🔄 Procesando nueva imagen para libro: {libro_actualizado.titulo}")
+                libro_actualizado.resize_image()
+                
             messages.success(request, 'Datos del libro actualizados.')
             return redirect('detalle_libro', pk=libro.pk)
     else:
@@ -57,3 +71,19 @@ def eliminar_libro(request, pk):
     libro.delete()
     messages.success(request, 'Libro eliminado.')
     return redirect('lista_libros')
+
+@login_required
+def nuevo_libro_modal(request):
+    if request.method == 'POST':
+        form = LibroForm(request.POST, request.FILES)
+        if form.is_valid():
+            libro = form.save()
+            html = render_to_string('libros/libro_row.html', {'libro': libro}, request=request)
+            return JsonResponse({'success': True, 'html': html})
+        else:
+            html = render_to_string('libros/nuevo_libro_form.html', {'form': form}, request=request)
+            return JsonResponse({'success': False, 'form_html': html})
+    else:
+        form = LibroForm()
+        html = render_to_string('libros/nuevo_libro_form.html', {'form': form}, request=request)
+        return JsonResponse({'form_html': html})
