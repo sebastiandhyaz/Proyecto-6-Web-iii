@@ -1,0 +1,20 @@
+<tr id="prestamo-{{ prestamo.id }}" class="border-b hover:bg-blue-50 transition">
+    <td class="px-4 py-2">{{ prestamo.socio.user.get_full_name|default:prestamo.socio.user.username }}</td>
+    <td class="px-4 py-2">{{ prestamo.libro.titulo }}</td>
+    <td class="px-4 py-2">{{ prestamo.fecha_prestamo }}</td>
+    <td class="px-4 py-2">{{ prestamo.fecha_devolucion_estimada }}</td>
+    <td class="px-4 py-2">
+        <span class="px-2 py-1 rounded text-sm
+            {% if prestamo.estado == 'activo' %}bg-green-100 text-green-800
+            {% elif prestamo.estado == 'vencido' %}bg-red-100 text-red-800
+            {% else %}bg-gray-100 text-gray-800{% endif %}">
+            {{ prestamo.estado|title }}
+        </span>
+    </td>
+    <td class="px-4 py-2 flex gap-2 justify-center">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+        {% if prestamo.estado == 'activo' %}
+        <button class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Devolver">Devolver</button>
+        {% endif %}
+    </td>
+</tr>

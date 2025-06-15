@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Préstamo | Biblioteca{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Detalle del préstamo</h1>
+<div class="bg-white p-6 rounded shadow-md max-w-lg mx-auto mb-4">
+    <p><strong>Socio:</strong> {{ prestamo.socio.user.get_full_name }}</p>
+    <p><strong>Libro:</strong> {{ prestamo.libro.titulo }}</p>
+    <p><strong>Fecha préstamo:</strong> {{ prestamo.fecha_prestamo }}</p>
+    <p><strong>Fecha devolución estimada:</strong> {{ prestamo.fecha_devolucion_estimada }}</p>
+    <p><strong>Fecha devolución real:</strong> {{ prestamo.fecha_devolucion_real|default:'-' }}</p>
+    <p><strong>Estado:</strong> {{ prestamo.estado }}</p>
+    <p><strong>Renovado:</strong> {{ prestamo.renovado|yesno:'Sí,No' }}</p>
+</div>
+<a href="{% url 'devolver_prestamo' prestamo.pk %}" class="bg-green-600 text-white px-4 py-2 rounded mr-2">Registrar devolución</a>
+<a href="{% url 'renovar_prestamo' prestamo.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded">Renovar</a>
+{% endblock %}

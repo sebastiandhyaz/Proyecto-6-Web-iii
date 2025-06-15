@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Anular Multa | Biblioteca{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Anular multa</h1>
+<form method="post" class="bg-white p-6 rounded shadow-md max-w-lg mx-auto">
+    {% csrf_token %}
+    <label for="justificacion">Justificación:</label>
+    <textarea name="justificacion" id="justificacion" class="w-full border rounded p-2 mb-4"></textarea>
+    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Anular multa</button>
+</form>
+{% endblock %}

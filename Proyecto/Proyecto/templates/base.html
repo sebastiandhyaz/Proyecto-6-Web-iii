@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Biblioteca{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard-global.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+    <!-- Sidebar global único y fijo -->
+    <aside id="sidebar" class="w-64 bg-white shadow-lg flex flex-col p-6 min-h-screen">
+        <div class="mb-8 flex flex-col items-center">
+            <span class="text-3xl font-bold text-blue-700">📚 Biblioteca</span>
+            <span class="text-sm text-gray-500 mt-2">{{ request.user.username }} ({{ request.user.is_superuser|yesno:'Administrador,Bibliotecario' }})</span>
+        </div>
+        <nav class="flex-1 mt-6">
+            <ul class="space-y-4">
+                <li><a href="/estadisticas/" class="sidebar-link flex items-center gap-2 text-blue-700 font-semibold"><i class="ti ti-layout-dashboard"></i> <span class="sidebar-text">Dashboard</span></a></li>
+                <li><a href="/libros/" class="sidebar-link flex items-center gap-2"><i class="ti ti-book"></i> <span class="sidebar-text">Libros</span></a></li>
+                <li><a href="/socios/" class="sidebar-link flex items-center gap-2"><i class="ti ti-users"></i> <span class="sidebar-text">Socios</span></a></li>
+                <li><a href="/prestamos/" class="sidebar-link flex items-center gap-2"><i class="ti ti-arrows-exchange"></i> <span class="sidebar-text">Préstamos</span></a></li>
+                <li><a href="/multas/" class="sidebar-link flex items-center gap-2"><i class="ti ti-currency-dollar"></i> <span class="sidebar-text">Multas</span></a></li>
+                <li><a href="#" class="sidebar-link flex items-center gap-2" id="configuracion-btn"><i class="ti ti-settings"></i> <span class="sidebar-text">Configuración</span></a></li>
+            </ul>
+        </nav>
+        <div class="mt-8 text-center">
+            <button onclick="window.location.href='/logout/'" class="sidebar-logout">Salir</button>
+        </div>
+    </aside>
+    <!-- Contenido principal -->
+    <main class="flex-1 p-8">
+        {% block content %}{% endblock %}
+    </main>
+    {% block extra_scripts %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script src="{% static 'js/dashboard-animations.js' %}"></script>
+</body>
+</html>

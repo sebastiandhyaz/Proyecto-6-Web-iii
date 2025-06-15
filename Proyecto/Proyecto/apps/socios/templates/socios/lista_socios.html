@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Socios | Biblioteca{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div class="main-panel-anim">
+<h1 class="text-2xl font-bold mb-4">Socios</h1>
+<!-- Barra de búsqueda y filtros -->
+<div class="flex flex-wrap gap-4 items-center mb-6">
+    <input type="text" placeholder="Buscar por nombre o email" class="border rounded px-3 py-2 flex-1 min-w-[200px]" />
+    <select class="border rounded px-3 py-2">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="bloqueado">Bloqueado</option>
+    </select>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition main-btn-anim">Buscar</button>
+</div>
+<!-- Botón Crear Socio -->
+<div class="mb-4">
+    <a href="{% url 'nuevo_socio' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Socio</a>
+</div>
+<!-- Tabla de socios -->
+<table class="min-w-full bg-white rounded shadow overflow-hidden">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="px-4 py-2">Nombre</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Estado</th>
+            <th class="px-4 py-2">Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="socios-tbody">
+        {% if socios|length == 0 %}
+        <tr id="no-socios-message">
+            <td colspan="4" class="text-center py-8 text-gray-500">No hay socios registrados. Usa el botón <b>Crear Socio</b> para agregar uno nuevo.</td>
+        </tr>
+        {% else %}
+        {% for socio in socios %}
+        <tr class="border-b hover:bg-blue-50 transition" id="socio-{{ socio.id }}">
+            <td class="px-4 py-2">{{ socio.user.get_full_name }}</td>
+            <td class="px-4 py-2">{{ socio.user.email }}</td>
+            <td class="px-4 py-2">{{ socio.estado }}</td>
+            <td class="px-4 py-2 flex gap-2 justify-center">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+                {% if socio.estado != 'bloqueado' %}
+                <button class="bg-gray-500 hover:bg-gray-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Bloquear">Bloquear</button>
+                {% endif %}
+                <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+<!-- Scripts -->
+<script>
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const socioId = row.id.replace('socio-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `/socios/${socioId}/`;
+        } else if (action === 'Editar') {
+            window.location.href = `/socios/${socioId}/editar/`;
+        } else if (action === 'Bloquear') {
+            if (confirm('¿Estás seguro de que quieres bloquear este socio?')) {
+                fetch(`/socios/${socioId}/bloquear/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar este socio? Esta acción no se puede deshacer.')) {
+                fetch(`/socios/${socioId}/eliminar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        }
+    }
+});
+</script>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Multa | Biblioteca{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Detalle de la multa</h1>
+<div class="bg-white p-6 rounded shadow-md max-w-lg mx-auto mb-4">
+    <p><strong>Socio:</strong> {{ multa.socio.user.get_full_name }}</p>
+    <p><strong>Préstamo:</strong> {{ multa.prestamo }}</p>
+    <p><strong>Monto:</strong> ${{ multa.monto }}</p>
+    <p><strong>Motivo:</strong> {{ multa.motivo }}</p>
+    <p><strong>Fecha generada:</strong> {{ multa.fecha_generada }}</p>
+    <p><strong>Pagada:</strong> {{ multa.pagada|yesno:'Sí,No' }}</p>
+    <p><strong>Anulada:</strong> {{ multa.anulada|yesno:'Sí,No' }}</p>
+    {% if multa.anulada %}
+        <p><strong>Justificación de anulación:</strong> {{ multa.justificacion_anulacion }}</p>
+    {% endif %}
+</div>
+<a href="{% url 'pagar_multa' multa.pk %}" class="bg-green-600 text-white px-4 py-2 rounded mr-2">Registrar pago</a>
+<a href="{% url 'anular_multa' multa.pk %}" class="bg-red-500 text-white px-4 py-2 rounded">Anular</a>
+{% endblock %}

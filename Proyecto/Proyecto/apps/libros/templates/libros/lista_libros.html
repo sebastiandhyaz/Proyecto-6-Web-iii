@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Libros | Biblioteca{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div class="main-panel-anim">
+<h1 class="text-2xl font-bold mb-4">Libros</h1>
+<!-- Barra de búsqueda y filtros -->
+<div class="flex flex-wrap gap-4 items-center mb-6">
+    <input type="text" placeholder="Buscar por título o autor" class="border rounded px-3 py-2 flex-1 min-w-[200px]" />
+    <select class="border rounded px-3 py-2">
+        <option value="">Todas las categorías</option>
+        <option value="ficcion">Ficción</option>
+        <option value="no-ficcion">No Ficción</option>
+    </select>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition main-btn-anim">Buscar</button>
+</div>
+<!-- Botón Crear Libro -->
+<div class="mb-4">
+    <a href="{% url 'nuevo_libro' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Libro</a>
+</div>
+<!-- Tabla de libros -->
+<table class="min-w-full bg-white rounded shadow overflow-hidden">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="px-4 py-2">Portada</th>
+            <th class="px-4 py-2">Título</th>
+            <th class="px-4 py-2">Autor</th>
+            <th class="px-4 py-2">ISBN</th>
+            <th class="px-4 py-2">Disponibles</th>
+            <th class="px-4 py-2">Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="libros-tbody">
+        {% if libros|length == 0 %}
+        <tr id="no-libros-message">
+            <td colspan="6" class="text-center py-8 text-gray-500">No hay libros registrados. Usa el botón <b>Crear Libro</b> para agregar uno nuevo.</td>
+        </tr>
+        {% else %}
+        {% for libro in libros %}
+        <tr class="border-b hover:bg-blue-50 transition" id="libro-{{ libro.id }}">
+            <td class="px-4 py-2">
+                {% if libro.portada %}
+                    <div class="book-cover-mini">
+                        <picture>
+                            <img src="{{ libro.portada.url }}" alt="Portada" />
+                        </picture>
+                    </div>
+                {% else %}
+                    <div class="book-cover-mini bg-gray-200 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                {% endif %}
+            </td>
+            <td class="px-4 py-2">{{ libro.titulo }}</td>
+            <td class="px-4 py-2">{{ libro.autor }}</td>
+            <td class="px-4 py-2">{{ libro.isbn }}</td>
+            <td class="px-4 py-2">{{ libro.disponibles }}</td>
+            <td class="px-4 py-2 flex gap-2 justify-center">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+</div>
+<script>
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const libroId = row.id.replace('libro-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `{% url 'detalle_libro' 0 %}`.replace('0', libroId);
+        } else if (action === 'Editar') {
+            window.location.href = `{% url 'editar_libro' 0 %}`.replace('0', libroId);
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar este libro? Esta acción no se puede deshacer.')) {
+                fetch(`{% url 'eliminar_libro' 0 %}`.replace('0', libroId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

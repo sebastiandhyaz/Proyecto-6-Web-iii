@@ -1,0 +1,13 @@
+<tr id="socio-{{ socio.id }}" class="border-b hover:bg-blue-50 transition">
+    <td class="px-4 py-2">{{ socio.user.get_full_name|default:socio.user.username }}</td>
+    <td class="px-4 py-2">{{ socio.user.email }}</td>
+    <td class="px-4 py-2">{{ socio.estado }}</td>
+    <td class="px-4 py-2 flex gap-2 justify-center">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+        <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+        {% if socio.estado != 'bloqueado' %}
+        <button class="bg-gray-500 hover:bg-gray-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Bloquear">Bloquear</button>
+        {% endif %}
+        <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+    </td>
+</tr>

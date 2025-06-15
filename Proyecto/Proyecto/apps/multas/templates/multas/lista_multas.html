@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Multas | Biblioteca{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div class="main-panel-anim">
+<h1 class="text-2xl font-bold mb-4">Multas</h1>
+<!-- Barra de búsqueda y filtros -->
+<div class="flex flex-wrap gap-4 items-center mb-6">
+    <input type="text" placeholder="Buscar por socio o motivo" class="border rounded px-3 py-2 flex-1 min-w-[200px]" />
+    <select class="border rounded px-3 py-2">
+        <option value="">Todos los estados</option>
+        <option value="pagada">Pagada</option>
+        <option value="impaga">Impaga</option>
+    </select>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition main-btn-anim">Buscar</button>
+</div>
+<!-- Botón Crear Multa -->
+<div class="mb-4">
+    <a href="{% url 'nueva_multa' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Multa</a>
+</div>
+<!-- Tabla de multas -->
+<table class="min-w-full bg-white rounded shadow overflow-hidden">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="px-4 py-2">Socio</th>
+            <th class="px-4 py-2">Libro</th>
+            <th class="px-4 py-2">Monto</th>
+            <th class="px-4 py-2">Motivo</th>
+            <th class="px-4 py-2">Fecha</th>
+            <th class="px-4 py-2">Pagada</th>
+            <th class="px-4 py-2">Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="multas-tbody">
+        {% if multas|length == 0 %}
+        <tr id="no-multas-message">
+            <td colspan="7" class="text-center py-8 text-gray-500">No hay multas registradas. Usa el botón <b>Crear Multa</b> para agregar una nueva.</td>
+        </tr>
+        {% else %}
+        {% for multa in multas %}
+        <tr class="border-b hover:bg-blue-50 transition" id="multa-{{ multa.id }}">
+            <td class="px-4 py-2">{{ multa.socio.user.get_full_name }}</td>
+            <td class="px-4 py-2">{{ multa.prestamo.libro.titulo }}</td>
+            <td class="px-4 py-2">{{ multa.monto }}</td>
+            <td class="px-4 py-2">{{ multa.motivo }}</td>
+            <td class="px-4 py-2">{{ multa.fecha_generada }}</td>
+            <td class="px-4 py-2">{% if multa.pagada %}Sí{% else %}No{% endif %}</td>
+            <td class="px-4 py-2 flex gap-2 justify-center">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+</div>
+<script>
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const multaId = row.id.replace('multa-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `{% url 'detalle_multa' 0 %}`.replace('0', multaId);
+        } else if (action === 'Editar') {
+            window.location.href = `{% url 'editar_multa' 0 %}`.replace('0', multaId);
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar esta multa? Esta acción no se puede deshacer.')) {
+                fetch(`{% url 'eliminar_multa' 0 %}`.replace('0', multaId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Pagar') {
+            if (confirm('¿Confirmar pago de esta multa?')) {
+                fetch(`{% url 'pagar_multa' 0 %}`.replace('0', multaId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Anular') {
+            const justificacion = prompt('Justificación para anular la multa:');
+            if (justificacion) {
+                fetch(`{% url 'anular_multa' 0 %}`.replace('0', multaId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({justificacion: justificacion})
+                }).then(() => location.reload());
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

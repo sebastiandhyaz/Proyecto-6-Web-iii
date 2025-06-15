@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Préstamos | Biblioteca{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div class="main-panel-anim">
+<h1 class="text-2xl font-bold mb-4">Préstamos</h1>
+<!-- Barra de búsqueda y filtros -->
+<div class="flex flex-wrap gap-4 items-center mb-6">
+    <input type="text" placeholder="Buscar por socio o libro" class="border rounded px-3 py-2 flex-1 min-w-[200px]" />
+    <select class="border rounded px-3 py-2">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="devuelto">Devuelto</option>
+        <option value="vencido">Vencido</option>
+    </select>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition main-btn-anim">Buscar</button>
+</div>
+<!-- Botón Crear Préstamo -->
+<div class="mb-4">
+    <a href="{% url 'nuevo_prestamo' %}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded shadow-lg transition main-btn-anim">Crear Préstamo</a>
+</div>
+<!-- Tabla de préstamos -->
+<table class="min-w-full bg-white rounded shadow overflow-hidden">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="px-4 py-2">Socio</th>
+            <th class="px-4 py-2">Libro</th>
+            <th class="px-4 py-2">Fecha Préstamo</th>
+            <th class="px-4 py-2">Fecha Devolución</th>
+            <th class="px-4 py-2">Estado</th>
+            <th class="px-4 py-2">Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="prestamos-tbody">
+        {% if prestamos|length == 0 %}
+        <tr id="no-prestamos-message">
+            <td colspan="6" class="text-center py-8 text-gray-500">No hay préstamos registrados. Usa el botón <b>Crear Préstamo</b> para agregar uno nuevo.</td>
+        </tr>
+        {% else %}
+        {% for prestamo in prestamos %}
+        <tr class="border-b hover:bg-blue-50 transition" id="prestamo-{{ prestamo.id }}">
+            <td class="px-4 py-2">{{ prestamo.socio.user.get_full_name }}</td>
+            <td class="px-4 py-2">{{ prestamo.libro.titulo }}</td>
+            <td class="px-4 py-2">{{ prestamo.fecha_prestamo }}</td>
+            <td class="px-4 py-2">{{ prestamo.fecha_devolucion_estimada }}</td>
+            <td class="px-4 py-2">{{ prestamo.estado }}</td>
+            <td class="px-4 py-2 flex gap-2 justify-center">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+                <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Editar">Editar</button>
+                <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Eliminar">Eliminar</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+</div>
+<script>
+// Funcionalidad de botones de acción
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('action-btn')) {
+        const action = e.target.textContent.trim();
+        const row = e.target.closest('tr');
+        const prestamoId = row.id.replace('prestamo-', '');
+        
+        if (action === 'Ver') {
+            window.location.href = `{% url 'detalle_prestamo' 0 %}`.replace('0', prestamoId);
+        } else if (action === 'Editar') {
+            window.location.href = `{% url 'editar_prestamo' 0 %}`.replace('0', prestamoId);
+        } else if (action === 'Eliminar') {
+            if (confirm('¿Estás seguro de que quieres eliminar este préstamo? Esta acción no se puede deshacer.')) {
+                fetch(`{% url 'eliminar_prestamo' 0 %}`.replace('0', prestamoId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        } else if (action === 'Devolver') {
+            if (confirm('¿Confirmar devolución de este préstamo?')) {
+                fetch(`{% url 'devolver_prestamo' 0 %}`.replace('0', prestamoId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => location.reload());
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

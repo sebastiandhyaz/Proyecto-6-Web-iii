@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso Biblioteca</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-blue-300 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+        <div id="login-form" class="block">
+            <h2 class="text-2xl font-bold mb-4 text-blue-700 text-center">Iniciar sesión</h2>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div>
+                    <label class="block text-gray-700">Usuario</label>
+                    {{ form.username }}
+                </div>
+                <div>
+                    <label class="block text-gray-700">Contraseña</label>
+                    {{ form.password }}
+                </div>
+                <button type="submit" name="login" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold">Entrar</button>
+            </form>
+            <div class="mt-4 text-center">
+                <a href="{% url 'password_reset' %}" class="text-blue-500 hover:underline">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div class="mt-4 text-center">
+                <button onclick="mostrarRegistro()" class="text-green-600 hover:underline">¿No tienes cuenta? Regístrate</button>
+            </div>
+        </div>
+        <div id="register-form" class="hidden">
+            <h2 class="text-2xl font-bold mb-4 text-green-700 text-center">Registrarse</h2>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ reg_form.non_field_errors }}
+                <div>
+                    <label class="block text-gray-700">Usuario</label>
+                    {{ reg_form.username }}
+                </div>
+                <div>
+                    <label class="block text-gray-700">Email</label>
+                    {{ reg_form.email }}
+                </div>
+                <div>
+                    <label class="block text-gray-700">Contraseña</label>
+                    {{ reg_form.password1 }}
+                </div>
+                <div>
+                    <label class="block text-gray-700">Repetir contraseña</label>
+                    {{ reg_form.password2 }}
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" required class="mr-2">
+                    <span class="text-xs text-gray-600">Acepto los <a href="#" class="text-blue-500 underline">términos y condiciones</a></span>
+                </div>
+                <button type="submit" name="register" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold">Crear cuenta</button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="mostrarLogin()" class="text-blue-600 hover:underline">¿Ya tienes cuenta? Inicia sesión</button>
+            </div>
+        </div>
+    </div>
+    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md">
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="mb-2 px-4 py-2 rounded {{ message.tags }} bg-red-100 text-red-700 text-center">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    <script>
+        function mostrarRegistro() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+        function mostrarLogin() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+        // Mejorar visualmente los inputs con Tailwind
+        document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]').forEach(function(input) {
+            input.classList.add('w-full', 'px-3', 'py-2', 'border', 'rounded');
+        });
+    </script>
+</body>
+</html>

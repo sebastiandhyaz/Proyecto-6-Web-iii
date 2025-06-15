@@ -1,0 +1,24 @@
+<tr id="multa-{{ multa.id }}" class="border-b hover:bg-blue-50 transition">
+    <td class="px-4 py-2">{{ multa.socio.user.get_full_name|default:multa.socio.user.username }}</td>
+    <td class="px-4 py-2">{{ multa.prestamo.libro.titulo|default:"Sin préstamo asociado" }}</td>
+    <td class="px-4 py-2">${{ multa.monto }}</td>
+    <td class="px-4 py-2">{{ multa.motivo }}</td>
+    <td class="px-4 py-2">{{ multa.fecha_generada }}</td>
+    <td class="px-4 py-2">
+        <span class="px-2 py-1 rounded text-sm
+            {% if multa.pagada %}bg-green-100 text-green-800
+            {% elif multa.anulada %}bg-gray-100 text-gray-800
+            {% else %}bg-red-100 text-red-800{% endif %}">
+            {% if multa.pagada %}Pagada
+            {% elif multa.anulada %}Anulada
+            {% else %}Pendiente{% endif %}
+        </span>
+    </td>
+    <td class="px-4 py-2 flex gap-2 justify-center">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Ver Detalle">Ver</button>
+        {% if not multa.pagada and not multa.anulada %}
+        <button class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Pagar">Pagar</button>
+        <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded transition action-btn main-btn-anim" title="Anular">Anular</button>
+        {% endif %}
+    </td>
+</tr>

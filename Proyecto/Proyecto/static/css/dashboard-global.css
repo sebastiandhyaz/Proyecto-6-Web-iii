@@ -1,0 +1,355 @@
+/* dashboard-global.css: estilos globales para dashboard y sidebar */
+
+#sidebar {
+  box-shadow: 0 4px 24px 0 rgba(30,64,175,0.07);
+  border-radius: 1rem;
+}
+.sidebar-link {
+  border-radius: 0.5rem;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s, scale 0.2s;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sidebar-link.active, .sidebar-link:focus {
+  background: #e0e7ff;
+  color: #1e40af;
+  box-shadow: 0 2px 8px 0 rgba(30,64,175,0.08);
+}
+.sidebar-link:hover {
+  background: #e0e7ff;
+  color: #1e40af;
+  box-shadow: 0 2px 8px 0 rgba(30,64,175,0.08);
+  scale: 1.04;
+}
+.sidebar-logout {
+  border-radius: 50px;
+  background: #d8e5ee !important;
+  background-color: #d8e5ee !important;
+  box-shadow: 20px 20px 60px #b8c3ca, -20px -20px 60px #f8ffff;
+  color: #ef4444 !important;
+  border: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 0.75rem 2.5rem;
+  transition: box-shadow 0.2s, background 0.2s, scale 0.2s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 10;
+  margin-bottom: 1.5rem;
+}
+.sidebar-logout:hover {
+  background: #e0e7ef !important;
+  background-color: #e0e7ef !important;
+  box-shadow: 0 8px 32px 0 #b8c3ca, 0 1.5px 0 #fff inset;
+  scale: 1.04;
+}
+
+/* Estilos para modales */
+.modal-overlay {
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+.modal-anim {
+    max-height: 85vh;
+    max-width: 90vw;
+    width: 500px;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-anim::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-anim::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-anim::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.modal-anim::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Mejoras para formularios */
+.crispy-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.crispy-form label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.crispy-form input, .crispy-form select, .crispy-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.crispy-form input:focus, .crispy-form select:focus, .crispy-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Estilos para formularios - campos de entrada más visibles */
+.form-control, 
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+input[type="date"], 
+input[type="tel"], 
+textarea, 
+select {
+    background-color: #f8fafc !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+    color: #1a202c !important;
+}
+
+.form-control:focus, 
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="password"]:focus, 
+input[type="number"]:focus, 
+input[type="date"]:focus, 
+input[type="tel"]:focus, 
+textarea:focus, 
+select:focus {
+    background-color: #ffffff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder, 
+input::placeholder, 
+textarea::placeholder {
+    color: #64748b !important;
+    opacity: 0.8 !important;
+}
+
+/* Estilos para etiquetas de formulario */
+.control-label, 
+.form-label, 
+label {
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 6px !important;
+    display: block !important;
+}
+
+/* Estilos para grupos de formulario */
+.form-group, 
+.mb-3, 
+.space-y-4 > * {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Estilos para campos de archivo */
+input[type="file"] {
+    background-color: #f8fafc !important;
+    border: 2px dashed #cbd5e0 !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    transition: all 0.2s ease !important;
+}
+
+input[type="file"]:hover {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+}
+
+/* Animaciones instantáneas para botones de acción */
+.action-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    transition: all 0.1s ease;
+}
+
+.main-btn-anim {
+    transition: all 0.1s ease;
+}
+
+/* Mejoras para las tablas */
+table thead th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+}
+
+/* Estados para elementos */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* Optimización de rendimiento - preloading */
+.modal-content {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+}
+
+/* Animaciones más rápidas */
+.fast-fade {
+    transition: opacity 0.15s ease-out;
+}
+
+.instant-scale {
+    transition: transform 0.1s ease-out;
+}
+
+/* Efecto para portadas de libros */
+picture::after {
+    background: inherit;
+    position: absolute;
+    content: ' ';
+    filter: blur(25px) saturate(1.5);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    scale: 1.05;
+    z-index: -1;
+}
+
+picture {
+    position: relative;
+    display: inline-block;
+}
+
+/* Efecto adicional para contenedores de imagen de libros */
+.book-cover-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    /* Proporción de 1080x1920: 9:16 */
+    aspect-ratio: 9/16;
+}
+
+.book-cover-container::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: inherit;
+    filter: blur(25px) saturate(1.5);
+    z-index: -1;
+    opacity: 0.3;
+    scale: 1.05;
+}
+
+.book-cover-container img {
+    position: relative;
+    z-index: 1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Contenedor para portada grande en detalle */
+.book-cover-large {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    /* Proporción real de 1080x1920: 9:16 */
+    aspect-ratio: 9/16;
+    max-width: 270px; /* Ajustado para la nueva proporción */
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.book-cover-large::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    background-image: inherit;
+    filter: blur(30px) saturate(1.8);
+    z-index: -1;
+    opacity: 0.4;
+    scale: 1.1;
+}
+
+.book-cover-large img {
+    position: relative;
+    z-index: 1;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    /* Evitar deformación */
+    flex-shrink: 0;
+}
+
+/* Miniatura para tabla */
+.book-cover-mini {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    /* Proporción de 1080x1920: 9:16 */
+    aspect-ratio: 9/16;
+    width: 36px; /* Ajustado para la nueva proporción */
+    height: 64px;
+}
+
+.book-cover-mini::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: inherit;
+    filter: blur(8px) saturate(1.3);
+    z-index: -1;
+    opacity: 0.2;
+    scale: 1.02;
+}
+
+.book-cover-mini img {
+    position: relative;
+    z-index: 1;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
