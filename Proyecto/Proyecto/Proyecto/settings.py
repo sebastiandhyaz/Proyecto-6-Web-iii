@@ -68,7 +68,9 @@ INSTALLED_APPS = [
     "apps.libros",
     "apps.prestamos",
     "apps.multas",
+    "apps.configuracion",
     "users",
+
 ]
 
 # Crispy forms configuration

@@ -29,6 +29,8 @@ urlpatterns = [
     path("libros/", include("apps.libros.urls")),
     path("prestamos/", include("apps.prestamos.urls")),
     path("multas/", include("apps.multas.urls")),
+    path('admin/', admin.site.urls),
+    path('configuracion/', include('apps.configuracion.urls')),
     path("api/dashboard-stats/", dashboard_stats, name="dashboard_stats"),
 ]
 

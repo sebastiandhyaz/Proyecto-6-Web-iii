@@ -1,0 +1,24 @@
+<!-- apps/configuracion/templates/base.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Mi Proyecto{% endblock %}</title>
+    
+</head>
+<body>
+    <header>
+        <h1>{% block header %}Bienvenido{% endblock %}</h1>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Aquí va el contenido de cada plantilla hija -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        &copy; 2025 Mi Proyecto
+    </footer>
+</body>
+</html>

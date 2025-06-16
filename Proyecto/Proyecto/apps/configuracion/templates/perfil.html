@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+<style>
+  .perfil-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: #f0f8f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgb(25 114 120 / 0.3);
+    font-family: Arial, sans-serif;
+  }
+  h2 {
+    color: #197278;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .perfil-info p {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+  }
+  form {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #197278;
+  }
+  input[type="text"], input[type="email"] {
+    padding: 0.6rem;
+    border-radius: 5px;
+    border: 1px solid #197278;
+    font-size: 1rem;
+  }
+  button {
+    margin-top: 1.5rem;
+    background: #197278;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background: #155a63;
+  }
+  .editar-link {
+    display: block;
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: #197278;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="perfil-container">
+  <h2>Perfil de {{ user.username }}</h2>
+
+  {% if not editar %}
+    <div class="perfil-info">
+      <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+      <p><strong>Nombre:</strong> {{ user.first_name }}</p>
+      <p><strong>Apellido:</strong> {{ user.last_name }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Dirección:</strong> {{ profile.direccion|default:"No especificada" }}</p>
+      <p><strong>Fecha de registro:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+    </div>
+
+    <a href="?editar=1" class="editar-link">Cambiar información del perfil</a>
+
+  {% else %}
+    <form method="POST">
+      {% csrf_token %}
+      <label for="first_name">Nombre</label>
+      <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+
+      <label for="last_name">Apellido</label>
+      <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{ user.email }}" required>
+
+      <label for="direccion">Dirección</label>
+      <input type="text" id="direccion" name="direccion" value="{{ profile.direccion|default_if_none:'' }}">
+
+      <button type="submit">Guardar Cambios</button>
+    </form>
+    <a href="{% url 'perfil' %}" class="editar-link">Cancelar</a>
+  {% endif %}
+</div>
+{% endblock %}
