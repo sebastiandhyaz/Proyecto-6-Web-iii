@@ -42,42 +42,63 @@
 
 ## 🚀 Instalación Rápida
 
+### Método 1: Instalación Automática (Recomendado)
+
 1. **Clona el repositorio**
    ```bash
    git clone <url-del-repositorio>
-   cd <nombre-del-proyecto>
+   cd Proyecto-6-Web-iii
    ```
 
-2. **Crea y activa el entorno virtual**
+2. **Ejecuta el script de configuración**
    ```bash
-   python -m venv venv
-   # Windows:
-   venv\Scripts\activate
-   # Mac/Linux:
-   source venv/bin/activate
+   ./setup.sh
+   ```
+
+3. **¡Inicia el servidor!**
+   ```bash
+   ./run_server.sh
+   ```
+
+### Método 2: Instalación Manual
+
+1. **Clona el repositorio**
+   ```bash
+   git clone <url-del-repositorio>
+   cd Proyecto-6-Web-iii/Proyecto
+   ```
+
+2. **Activa el entorno virtual existente**
+   ```bash
+   source env/bin/activate
    ```
 
 3. **Instala las dependencias**
    ```bash
-   pip install -r requirements.txt
+   pip install -r Proyecto/requirements.txt
    ```
 
-4. **Aplica las migraciones**
+4. **Navega al proyecto Django**
+   ```bash
+   cd Proyecto
+   ```
+
+5. **Aplica las migraciones**
    ```bash
    python manage.py migrate
    ```
 
-5. **(Opcional) Crea un superusuario**
+6. **(Opcional) Crea un superusuario**
    ```bash
    python manage.py createsuperuser
    ```
 
-6. **¡Ejecuta el servidor!**
+7. **¡Ejecuta el servidor!**
    ```bash
    python manage.py runserver
    ```
 
-7. **Accede desde tu navegador**
+8. **Accede desde tu navegador**
    
    <p align="center"><b>http://127.0.0.1:8000/</b></p>
 
@@ -93,6 +114,28 @@
 | **Multa**   | Penalizaciones por retrasos en la devolución de libros.     |
 
 ---
+
+## 🔧 Solución de Problemas
+
+### Error: "Couldn't import Django"
+Si obtienes el error `ModuleNotFoundError: No module named 'django'`:
+
+1. **Solución rápida**: Ejecuta `./setup.sh`
+2. **Solución manual**: 
+   ```bash
+   cd Proyecto
+   source env/bin/activate
+   pip install -r Proyecto/requirements.txt
+   ```
+
+### Error: "runserver" no funciona
+- Asegúrate de haber activado el entorno virtual: `source Proyecto/env/bin/activate`
+- Verifica que estés en el directorio correcto: `cd Proyecto/Proyecto`
+- Instala las dependencias si no están instaladas: `pip install -r requirements.txt`
+
+### Scripts Disponibles
+- `./setup.sh` - Configura el entorno e instala dependencias
+- `./run_server.sh` - Inicia el servidor de desarrollo automáticamente
 
 ## 💡 Notas Importantes
 
